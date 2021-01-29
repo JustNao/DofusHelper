@@ -180,9 +180,6 @@ def on_receive(pa, action):
     buf = buf1 if direction else buf2
     buf += raw(pa)
     msg = Msg.fromRaw(buf, direction)
-    if msg is None:
-        buf.end()
-        print("Flushing buffer")
     while msg:
         action(msg)
         msg = Msg.fromRaw(buf, direction)

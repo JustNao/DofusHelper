@@ -57,11 +57,12 @@ class Msg:
 
         except IndexError:
             buf.pos = 0
-            print("Could not parse message: Not complete")
+            logger.debug("Could not parse message: Not complete")
             return None
         except KeyError:
             buf.pos = 0
             print("KeyError :", id)
+            print("You may need to restart me !")
             return None
         else:
             # if id not in interestingPackets:

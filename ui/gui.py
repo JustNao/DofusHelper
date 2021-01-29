@@ -23,7 +23,7 @@ class GraphicalInterface():
     def load(self):
         if self.stopSniff is None:
             self.stopSniff = self.startSniff(self.packetRead)
-            print("Sniffer started")
+            print("Packet sniffer started")
             try:
                 botWindow['ON/OFF'].update(image_filename=imgList['on'])
             except NameError:
@@ -35,7 +35,7 @@ class GraphicalInterface():
         if self.stopSniff is not None:
             self.stopSniff()
             self.stopSniff = None
-            print("Sniffer stopped")
+            print("Packet sniffer stopped")
             try:
                 botWindow['ON/OFF'].update(image_filename=imgList['off'])
             except NameError:
@@ -156,7 +156,7 @@ class GraphicalInterface():
                 self.load()
             elif (event == sg.WIN_CLOSED) or (event == "EXIT"):
                 self.stopSniff()
-                print("Sniffer ended")
+                print("Packet sniffer ended")
                 break
             botWindow.refresh()
 

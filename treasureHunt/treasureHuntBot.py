@@ -69,8 +69,7 @@ class TreasureHuntHelper():
             '__file__')) + '\\sources\\img\\pixel\\bottomScreen.png', grayscale=True, confidence=.75)
         if bottomScreen is None:
             print(
-                Fore.RED + "Error : please keep your Dofus window open for the initilization" + Style.RESET_ALL)
-            g.ui.changeText("RESTART")
+                Fore.RED + "Error : please keep your Dofus window open for the initilization. You need to restart." + Style.RESET_ALL)
             return
 
         self.movePos = {
@@ -84,7 +83,7 @@ class TreasureHuntHelper():
 
     def move(self):
         # Déplacement du bot
-        if (not self.botting) or (self.hintPos.distance > 10):
+        if (not self.botting) or (self.hintPos.distance > 10 and not self.phorreur['lookingFor']):
             return
 
         currentMousePos = ag.position()
@@ -129,7 +128,7 @@ class TreasureHuntHelper():
     def changeMap(self, packet):
         self.playerPos = self.Position(
             mapIdToCoords[packet['mapId']][0], mapIdToCoords[packet['mapId']][1])
-        print("New position : [", self.playerPos.x, ',', self.playerPos.y, ']')
+        print("New position : ", self.playerPos.__str__())
         self.stepUpdate()
 
     def stepUpdate(self):
@@ -139,9 +138,11 @@ class TreasureHuntHelper():
             if self.playerPos.x != self.hintPos.x:
                 self.hintPos.distance = abs(self.playerPos.x - self.hintPos.x)
 
-                g.ui.changeImg(str(int(self.hintPos.distance)))
-                print("Horizontal distance from hint : ", Fore.GREEN +
+                if DEBUG:
+                    print("Horizontal distance from hint : ", Fore.GREEN +
                       str(self.hintPos.distance) + Style.RESET_ALL)
+                
+                g.ui.changeImg(str(int(self.hintPos.distance)))
 
                 if self.playerPos.x < self.hintPos.x:
                     direction = 'right'
@@ -153,9 +154,11 @@ class TreasureHuntHelper():
 
             elif self.playerPos.y != self.hintPos.y:
                 self.hintPos.distance = abs(self.playerPos.y - self.hintPos.y)
-
-                print("Vertical distance from hint : ", Fore.GREEN +
+                
+                if DEBUG:
+                    print("Vertical distance from hint : ", Fore.GREEN +
                       str(self.hintPos.distance) + Style.RESET_ALL)
+
                 g.ui.changeImg(str(int(self.hintPos.distance)))
 
                 if self.playerPos.y < self.hintPos.y:
@@ -167,7 +170,7 @@ class TreasureHuntHelper():
                 self.direction = direction
 
             else:
-                print(Fore.RED + "Hint found !" + Style.RESET_ALL)
+                print(Fore.GREEN + "Hint found !" + Style.RESET_ALL)
                 g.ui.changeImg("found")
                 g.ui.changeDirection()
                 self.direction = "stay"
@@ -184,7 +187,7 @@ class TreasureHuntHelper():
         for actor in packet["actors"]:
             if (actor['__type__'] == "GameRolePlayTreasureHintInformations"):
                 if (actor['npcId'] == self.phorreur['npcId']):
-                    print(Fore.RED + "Phorreur found !" + Style.RESET_ALL)
+                    print(Fore.GREEN + "Phorreur found !" + Style.RESET_ALL)
                     self.phorreur['lookingFor'] = False
                     self.hintPos = self.Hint(
                         self.playerPos.x, self.playerPos.y, 0)
@@ -210,19 +213,21 @@ class TreasureHuntHelper():
 
     def huntNewStep(self, packet):
         self.reset()
-
+        starting = False
         if len(packet['flags']) == 0:
             self.checkPositions.clear()
             self.checkPositions.append(
                 (mapIdToCoords[packet['startMapId']][0], mapIdToCoords[packet['startMapId']][1]))
             if (packet['checkPointCurrent'] == 0):
+                print(Fore.YELLOW + "Starting treasure hunt" + Style.RESET_ALL)
                 self.timeStart = time.time()
                 self.playerPos = self.Position(-25, -36)  # Malle aux trésors
-                self.direction = "stay"
                 g.ui.changeDirection()
+                starting = True
         elif len(packet['flags']) == packet['totalStepCount']:
             g.ui.changeImg("checkpoint")
-            if self.botting():
+            print(Fore.YELLOW + "Starting treasure hunt")
+            if self.botting:
                 g.ui.clickNextStep()
             g.ui.changeDirection()
             return
@@ -234,7 +239,6 @@ class TreasureHuntHelper():
                                                          self.timeStart)) + Style.RESET_ALL, " seconds to finish")
             g.ui.changeImg('combat')
             g.ui.load()
-            self.direction = "stay"
             return
 
         intDirection = packet['knownStepsList'][-1]['direction']
@@ -246,7 +250,9 @@ class TreasureHuntHelper():
             strDirection = 'left'
         else:
             strDirection = 'top'
-        self.direction = strDirection
+        
+        if not starting:
+            self.direction = strDirection
 
         if packet['knownStepsList'][-1]['__type__'] == 'TreasureHuntStepFollowDirectionToPOI':
             # Using Dofus-Map API to get hints based on position and direction
@@ -289,7 +295,7 @@ class TreasureHuntHelper():
 
         else:
             clientHintName = npcToName(packet['knownStepsList'][-1]['npcId'])
-            print("Phorreur to find ", Fore.GREEN +
+            print(Fore.YELLOW + "Phorreur" + Style.RESET_ALL + " to find ", Fore.GREEN +
                   strDirection + Style.RESET_ALL)
             self.phorreur['lookingFor'] = True
             self.phorreur['npcId'] = packet['knownStepsList'][-1]['npcId']

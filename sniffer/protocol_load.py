@@ -9,7 +9,7 @@ if getattr(sys, 'frozen', False):
     application_path = sys._MEIPASS
 else:
     application_path = os.path.dirname(os.path.abspath(__file__))
-
+    
 with (Path(__file__).parent / "protocol.pk").open("rb") as f:
     types = pickle.load(f)
     msg_from_id = pickle.load(f)
