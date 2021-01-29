@@ -4,5 +4,4 @@ requests
 colorama
 pyautogui
 pysimplegui
-pickle
-zlib
+pillow

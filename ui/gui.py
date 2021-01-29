@@ -5,8 +5,6 @@ import threading
 import pyautogui as ag
 from treasureHunt.treasureHuntBot import TreasureHuntHelper
 
-
-
 class GraphicalInterface():
     def __init__(self, startSniff):
         ag.PAUSE = 0

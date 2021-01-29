@@ -5,6 +5,7 @@ Repo pour diffuser le bot (projet perso).
 ## Installation
 
 1. Installer [Python 3](https://www.python.org/downloads/)
+2. Installer [Npcap](https://nmap.org/npcap/)
 2. Exporter le git (bash, zip, ...)
 3. Ouvrir une invite de commande / terminal et taper
 ```bash

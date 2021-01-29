@@ -1,6 +1,3 @@
-from asyncio.windows_events import NULL
-
-from PIL.ImageOps import grayscale
 from sniffer import protocol
 import requests
 import time
@@ -26,9 +23,9 @@ class TreasureHuntHelper():
         self.interestingPackets = [2889, 5745, 7529, 9917, 2291, 4119, 9401]
         self.playerPos = self.Position()
         self.hintPos = self.Hint()
-        self.timeStart = NULL
+        self.timeStart = None
         self.direction = "stay"
-        self.clientHintName = NULL
+        self.clientHintName = None
         self.checkPositions = []
         self.phorreur = {
             "lookingFor": False,

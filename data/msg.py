@@ -1,4 +1,3 @@
-from asyncio.windows_events import NULL
 import logging
 
 from .binrw import Data, Buffer
@@ -66,7 +65,7 @@ class Msg:
             return None
         else:
             # if id not in interestingPackets:
-            #     return Msg(id, NULL, count)
+            #     return Msg(id, None, count)
             if id == 2:
                 logger.debug("Message is NetworkDataContainerMessage! Uncompressing...")
                 newbuffer = Buffer(data.readByteArray())
