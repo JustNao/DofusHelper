@@ -25,6 +25,7 @@ class TreasureHuntHelper():
         self.playerPos = self.Position()
         self.hintPos = self.Hint()
         self.timeStart = None
+        self.timeStart = 0
         self.direction = "stay"
         self.clientHintName = None
         self.checkPositions = []
@@ -96,7 +97,7 @@ class TreasureHuntHelper():
                 time.sleep(0.2)
 
             while ag.locateOnScreen(os.path.dirname(os.path.realpath(
-                    '__file__')) + '\\sources\\img\\pixel\\sideBlack.png', grayscale=True, confidence=0.75) is not None:
+                    '__file__')) + '\\sources\\img\\pixel\\groupOnMouse.png', grayscale=True, confidence=0.75) is not None:
                 x += random()*50 - 25
                 ag.moveTo(x, y)
 
@@ -228,8 +229,8 @@ class TreasureHuntHelper():
                 self.playerPos = self.Position(-25, -36)  # Malle aux trésors
                 g.ui.changeDirection()
                 starting = True
-                ag.click(ag.locateCenterOnScreen(os.path.dirname(os.path.realpath(
-                    '__file__')) + '\\..\\sources\\img\\pixel\\'), grayscale = True, confidence = 0.75)
+                # ag.click(ag.locateCenterOnScreen(os.path.dirname(os.path.realpath(
+                    # '__file__')) + '\\sources\\img\\pixel\\sideBlack.png', grayscale = True, confidence = 0.75))
         elif len(packet['flags']) == packet['totalStepCount']:
             g.ui.changeImg("checkpoint")
             print(Fore.YELLOW + "Checkpoint reached !" + Fore.RESET)

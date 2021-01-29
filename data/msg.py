@@ -59,7 +59,7 @@ class Msg:
             logger.debug("Could not parse message: Not complete")
             return None
         except KeyError:
-            buf.pos = 0
+            buf.pos = len(buf.data)
             print("KeyError :", id)
             print("You may need to restart me !")
             return None

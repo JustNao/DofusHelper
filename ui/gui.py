@@ -175,17 +175,20 @@ class GraphicalInterface():
 
     def clickNextStep(self):
         currentX, currentY = ag.position()
-        if self.found == "found":
-            pos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\' + 'flag.png', grayscale=True, confidence=.8)
-            ag.leftClick(pos[0], pos[1])
-        elif self.found == "checkpoint":
-            pos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\' + 'checkpoint.png', grayscale=True, confidence=.8)
-            ag.leftClick(pos[0], pos[1])
-        elif self.found == "combat":
-            pos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\' + 'combat.png', grayscale=True, confidence=.8)
-            ag.leftClick(pos[0], pos[1])
-        else:
-            print("No next step detected :(")
+        try:
+            if self.found == "found":
+                pos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\' + 'flag.png', grayscale=True, confidence=.8)
+                ag.leftClick(pos[0], pos[1])
+            elif self.found == "checkpoint":
+                pos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\' + 'checkpoint.png', grayscale=True, confidence=.8)
+                ag.leftClick(pos[0], pos[1])
+            elif self.found == "combat":
+                pos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\' + 'combat.png', grayscale=True, confidence=.8)
+                ag.leftClick(pos[0], pos[1])
+            else:
+                print("No next step detected :(")
+        except AttributeError:
+            pass
 
         ag.moveTo(currentX, currentY)
         self.found = None
