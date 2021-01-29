@@ -1,3 +1,4 @@
+from PIL.ImageOps import grayscale
 from sniffer import protocol
 import requests
 import time
@@ -66,7 +67,7 @@ class TreasureHuntHelper():
             '__file__')) + '\\sources\\img\\pixel\\bottomScreen.png', grayscale=True, confidence=.75)
         if bottomScreen is None:
             print(
-                Fore.RED + "Error : please keep your Dofus window open for the initilization. You need to restart." + Style.RESET_ALL)
+                Fore.RED + "Error : please keep your Dofus window open for the initilization. You need to restart." + Fore.RESET)
             return
 
         self.movePos = {
@@ -86,19 +87,25 @@ class TreasureHuntHelper():
         currentMousePos = ag.position()
         # time.sleep(random()*2) # Temps de pause entre chaque action, risqué car fait attendre le thread entier
         try:
-            ag.PAUSE = 0.2
+
             x, y = self.movePos[self.direction]
             ag.moveTo(x, y)
-            time.sleep(0.2)
+
+            if (self.direction == 'top') or (self.direction == 'bottom'):
+                ag.PAUSE = 0.2
+                time.sleep(0.2)
+
             while ag.locateOnScreen(os.path.dirname(os.path.realpath(
-                    '__file__')) + '\\sources\\img\\pixel\\groupOnMouse.png', grayscale=True, confidence=0.75) is not None:
-                x += random()*20 - 10
+                    '__file__')) + '\\sources\\img\\pixel\\sideBlack.png', grayscale=True, confidence=0.75) is not None:
+                x += random()*50 - 25
                 ag.moveTo(x, y)
+
             ag.PAUSE = 0
-            print("Bot moved", self.direction)
-            ag.click(x, y)
+            print("Bot moved", Fore.YELLOW + self.direction + Fore.RESET)
+            ag.click()
         except KeyError:
-            print("Bot can't move, need to stay put")
+            # print("Bot can't move, need to stay put")
+            pass
 
         ag.moveTo(currentMousePos)
 
@@ -137,7 +144,7 @@ class TreasureHuntHelper():
 
                 if DEBUG:
                     print("Horizontal distance from hint : ", Fore.GREEN +
-                      str(self.hintPos.distance) + Style.RESET_ALL)
+                      str(self.hintPos.distance) + Fore.RESET)
                 
                 g.ui.changeImg(str(int(self.hintPos.distance)))
 
@@ -154,7 +161,7 @@ class TreasureHuntHelper():
                 
                 if DEBUG:
                     print("Vertical distance from hint : ", Fore.GREEN +
-                      str(self.hintPos.distance) + Style.RESET_ALL)
+                      str(self.hintPos.distance) + Fore.RESET)
 
                 g.ui.changeImg(str(int(self.hintPos.distance)))
 
@@ -167,7 +174,7 @@ class TreasureHuntHelper():
                 self.direction = direction
 
             else:
-                print(Fore.GREEN + "Hint found !" + Style.RESET_ALL)
+                print(Fore.GREEN + "Hint found !" + Fore.RESET)
                 g.ui.changeImg("found")
                 g.ui.changeDirection()
                 self.direction = "stay"
@@ -184,7 +191,7 @@ class TreasureHuntHelper():
         for actor in packet["actors"]:
             if (actor['__type__'] == "GameRolePlayTreasureHintInformations"):
                 if (actor['npcId'] == self.phorreur['npcId']):
-                    print(Fore.GREEN + "Phorreur found !" + Style.RESET_ALL)
+                    print(Fore.GREEN + "Phorreur found !" + Fore.RESET)
                     self.phorreur['lookingFor'] = False
                     self.hintPos = self.Hint(
                         self.playerPos.x, self.playerPos.y, 0)
@@ -199,7 +206,7 @@ class TreasureHuntHelper():
             elif (actor['__type__'] == 'GameRolePlayGroupMonsterInformations'):
                 mainMob = actor['staticInfos']['mainCreatureLightInfos']['genericId']
                 if monsterToName(mainMob) in archiNameList:
-                    print(Fore.BLUE + "Archimonstre found !" + Style.RESET_ALL)
+                    print(Fore.BLUE + "Archimonstre found !" + Fore.RESET)
                     g.ui.changeImg('archimonstre')
                     g.ui.load()
                     self.direction = "stay"
@@ -216,14 +223,16 @@ class TreasureHuntHelper():
             self.checkPositions.append(
                 (mapIdToCoords[packet['startMapId']][0], mapIdToCoords[packet['startMapId']][1]))
             if (packet['checkPointCurrent'] == 0):
-                print(Fore.YELLOW + "Starting treasure hunt" + Style.RESET_ALL)
+                print(Fore.YELLOW + "Starting treasure hunt" + Fore.RESET)
                 self.timeStart = time.time()
                 self.playerPos = self.Position(-25, -36)  # Malle aux trésors
                 g.ui.changeDirection()
                 starting = True
+                ag.click(ag.locateCenterOnScreen(os.path.dirname(os.path.realpath(
+                    '__file__')) + '\\..\\sources\\img\\pixel\\'), grayscale = True, confidence = 0.75)
         elif len(packet['flags']) == packet['totalStepCount']:
             g.ui.changeImg("checkpoint")
-            print(Fore.YELLOW + "Starting treasure hunt")
+            print(Fore.YELLOW + "Checkpoint reached !" + Fore.RESET)
             if self.botting:
                 g.ui.clickNextStep()
             g.ui.changeDirection()
@@ -231,9 +240,9 @@ class TreasureHuntHelper():
 
         if packet['checkPointCurrent'] >= packet['checkPointTotal'] - 1:
             end = time.time()
-            print(Fore.MAGENTA + "Treasure found !" + Style.RESET_ALL)
+            print(Fore.MAGENTA + "Treasure found !" + Fore.RESET)
             print("This hunt took ", Fore.CYAN + str(int(end -
-                                                         self.timeStart)) + Style.RESET_ALL, " seconds to finish")
+                                                         self.timeStart)) + Fore.RESET, " seconds to finish")
             g.ui.changeImg('combat')
             g.ui.load()
             return
@@ -274,15 +283,15 @@ class TreasureHuntHelper():
                             hint['x'], hint['y'], hint['d'])
 
             if self.hintPos.distance == 666:
-                print(Fore.RED + "ERROR : no hint found !" + Style.RESET_ALL)
+                print(Fore.RED + "ERROR : no hint found !" + Fore.RESET)
                 print(packet)
                 g.ui.changeText("No hint found")
                 g.ui.changeImg('found')
                 self.direction = "stay"
             else:
                 self.checkPositions.append((self.hintPos.x, self.hintPos.y))
-                print(Fore.YELLOW + clientHintName + Style.RESET_ALL + " found " + Fore.GREEN + str(self.hintPos.distance) + Style.RESET_ALL +
-                      " maps " + Fore.GREEN + strDirection + Style.RESET_ALL + " at " + Fore.YELLOW + self.hintPos.__str__() + Style.RESET_ALL)
+                print(Fore.YELLOW + clientHintName + Fore.RESET + " found " + Fore.GREEN + str(self.hintPos.distance) + Fore.RESET +
+                      " maps " + Fore.GREEN + strDirection + Fore.RESET + " at " + Fore.YELLOW + self.hintPos.__str__() + Fore.RESET)
                 g.ui.changeText(self.hintPos.__str__())
                 g.ui.changeDirection(strDirection)
                 g.ui.changeImg(str(int(math.sqrt(math.pow(
@@ -292,8 +301,8 @@ class TreasureHuntHelper():
 
         else:
             clientHintName = npcToName(packet['knownStepsList'][-1]['npcId'])
-            print(Fore.YELLOW + "Phorreur" + Style.RESET_ALL + " to find ", Fore.GREEN +
-                  strDirection + Style.RESET_ALL)
+            print(Fore.YELLOW + "Phorreur" + Fore.RESET + " to find ", Fore.GREEN +
+                  strDirection + Fore.RESET)
             self.phorreur['lookingFor'] = True
             self.phorreur['npcId'] = packet['knownStepsList'][-1]['npcId']
             g.ui.changeDirection(strDirection)

@@ -1,4 +1,4 @@
-scapy == 2.4.0
+scapy == 2.4.2
 opencv_python
 requests
 colorama

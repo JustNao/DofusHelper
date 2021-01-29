@@ -153,8 +153,7 @@ class GraphicalInterface():
             elif event == "ON/OFF":
                 self.load()
             elif (event == sg.WIN_CLOSED) or (event == "EXIT"):
-                self.stopSniff()
-                print("Packet sniffer ended")
+                self.stop()
                 break
             botWindow.refresh()
 
