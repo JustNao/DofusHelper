@@ -1,0 +1,8 @@
+scapy == 2.4.0
+opencv_python
+requests
+colorama
+pyautogui
+pysimplegui
+pickle
+zlib
