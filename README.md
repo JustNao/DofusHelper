@@ -35,7 +35,12 @@ Mêmes fonctionnalités et fenêtre que le helper, mais tout est automatisé (sa
 ### HDV List
 
 Liste les objets en vente dans un HDV, avec la différence entre les prix postés par le joueur et le prix actuel. Trie les objets par différence en %.
-TODO : actualisation automatique des prix.
+
+Cliquer sur le bouton 'Automate Prices' va actualiser tous les items dont la différence est strictement supérieur à la valeur spécifiée dans la cellule d'input. Chaque item sera alors posté à 1 Kamas moins cher.
+
+### Fail Safe
+
+Dans n'importe quel module, quand le bot pixel est utilisé, placer la souris dans le coin supérieur gauche de l'écran stoppera le bot (il faudra relancer l'application pour relancer le bot).
 
 ## Copyright
 Merci à [LaBot](https://github.com/louisabraham/LaBot) pour son reader/writer de packet.

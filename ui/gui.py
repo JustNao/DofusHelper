@@ -1,10 +1,11 @@
 from tkinter import TclError
-from tkinter.constants import CENTER, RIGHT
+from tkinter.constants import CENTER, DISABLED, RIGHT
 import PySimpleGUI as sg
 import os, sys
 import threading
 import pyautogui as ag
 from colorama import Fore
+import time
 
 
 class GraphicalInterface():
@@ -30,7 +31,7 @@ class GraphicalInterface():
                                                   'INPUT': '#676866',
                                                   'SCROLL': '#E3E3E3',
                                                   'TEXT_INPUT': '#676866',
-                                                  'BUTTON': ('#bcd800', '#bcd800'),
+                                                  'BUTTON': ('black', '#bcd800'),
                                                   'PROGRESS': '#bcd800',
                                                   'BORDER': 1,
                                                   'SLIDER_DEPTH': 0,
@@ -106,7 +107,7 @@ class GraphicalInterface():
                 [
                     sg.Radio("HDV Items Listing", group_id = "CHOICE", key = 'hdv')
                 ],
-                [sg.Button("Launch", key = "LAUNCH")]
+                [sg.Button("Launch", key = "LAUNCH", use_ttk_buttons = True)]
             ]
 
         menuWindow = sg.Window(
@@ -117,7 +118,8 @@ class GraphicalInterface():
             keep_on_top=False,
             finalize=True,
             element_justification=CENTER,
-            icon = application_path + '\\..\\sources\\img\\icon\\phoenix.ico'
+            icon = application_path + '\\..\\sources\\img\\icon\\phoenix.ico',
+            use_default_focus = False
             )
 
         while True:
@@ -187,6 +189,8 @@ class GraphicalInterface():
 
     def startHdvUi(self):
         global moduleWindow
+        from modules.hdvListing import automatePrices
+
         self.hdvListInitialisation()
 
         headings = ['            ITEM            ', '(1) PRIX JOUEUR', '(1) PRIX HDV', '(10) PRIX JOUEUR', '(10) PRIX HDV', '(100) PRIX JOUEUR', '(100) PRIX HDV', 'DIFFERENCE']
@@ -194,6 +198,8 @@ class GraphicalInterface():
         layout = [
             [sg.Button(image_filename=imgList['on'], button_color=('#2c2e25',
             '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0)),
+            sg.Input('0', disabled = True, visible = False, key = '-PERCENT-', background_color = '#6e6f6e', size = (10, 10), text_color = '#eec606'),
+            sg.Button('Automate Prices', visible = False, border_width = 0, key = '-AUTOMATE-'),
             sg.ProgressBar(100, key = '-BAR-', orientation = 'h', size = (20, 20), bar_color = ('#bfe700', '#6e6f6e'))],
             [sg.Table(values = [['' for _ in range(len(headings))]],
             headings = headings, 
@@ -217,13 +223,21 @@ class GraphicalInterface():
                 break
             elif event == "ON/OFF":
                 self.load()
-
+            elif event == "-AUTOMATE-":
+                moduleWindow['-BAR-'].update(current_count = 0, visible = True)
+                moduleWindow['-PERCENT-'].update(visible  = False, disabled = True)
+                moduleWindow['-AUTOMATE-'].update(visible = False)
+                t = threading.Thread(target=automatePrices, args = (int(float(values['-PERCENT-'])), ), name="Pricing")
+                t.start()
         moduleWindow.close()
         
     def dataUpdate(self, data, colors = None):
         moduleWindow['-TABLE-'].update(values = data, row_colors = colors)
         moduleWindow.bring_to_front()
         moduleWindow['-BAR-'].update(current_count = 100, visible = False)
+        # moduleWindow['-BAR-'].update_bar(0)
+        moduleWindow['-PERCENT-'].update(visible  = True, disabled = False)
+        moduleWindow['-AUTOMATE-'].update(visible = True)
         self.load()
 
     def updateProgressBar(self, value):
@@ -262,9 +276,16 @@ class GraphicalInterface():
 
         ag.moveTo(currentX, currentY)
         self.found = None
+    
+    def warningPopup(self):
+        sg.Popup('WARNING', 'L\'item va être posté à un prix très éloigné du prix moyen estimé. Etes-vous sûr de vouloir le poster à ce prix ?')
 
 
 def init(startSniff):
     global ui
     ui = GraphicalInterface(startSniff)
-    ui.startUi()
+    try:
+        ui.startUi()
+    except sg.FailSafeException:
+        print(Fore.RED + 'Fail Safe Activated, aborting' + Fore.RESET)
+
