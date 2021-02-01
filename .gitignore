@@ -1,8 +1,7 @@
 all_widgets.py
 main.spec
 nomansland.py
-test copy.json
-test.json
+*json
 __pycache__/*
 data/__pycache__/*
 scripts/*
@@ -13,3 +12,4 @@ treasureHunt/__pycache__/*
 ui/__pycache__/*
 packetInfo.txt
 .vscode/*
+uiTest.py

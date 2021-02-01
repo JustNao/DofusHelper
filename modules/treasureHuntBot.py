@@ -1,3 +1,4 @@
+print('Importing sources ...')
 from PIL.ImageOps import grayscale
 from sniffer import protocol
 import requests
@@ -9,6 +10,7 @@ import ui.gui as g
 import pyautogui as ag
 from random import random
 import math
+print('Sources imported !')
 
 init()  # Don't touch, used for colors in terminal
 

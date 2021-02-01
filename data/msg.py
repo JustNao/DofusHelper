@@ -61,7 +61,6 @@ class Msg:
         except KeyError:
             buf.pos = len(buf.data)
             print("KeyError :", id)
-            print("You may need to restart me !")
             return None
         else:
             # if id not in interestingPackets:

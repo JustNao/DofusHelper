@@ -15,7 +15,6 @@ with open('sources\\gameRessources\\Archi.json', encoding='utf-8') as f:
 with open('sources\\gameRessources\\Monsters.json', encoding='utf-8') as f:
     monsterJs = json.load(f)
 
-
 mapIdToCoords = {}
 for k in mapPositions:
     mapIdToCoords[int(k['id'])] = [k['posX'], k['posY']]
