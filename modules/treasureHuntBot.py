@@ -115,8 +115,7 @@ class TreasureHuntHelper():
     def packetRead(self, msg):
         if msg.id in self.interestingPackets:
             try:
-                packet = protocol.read(
-                    protocol.msg_from_id[msg.id]["name"], msg.data)
+                packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
             except KeyError:
                 print("KeyError ", msg.id)
                 return

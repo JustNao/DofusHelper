@@ -36,17 +36,10 @@ class GraphicalInterface():
                                                   'BORDER': 1,
                                                   'SLIDER_DEPTH': 0,
                                                   'PROGRESS_DEPTH': 0}
-
-    def treasureBotInitialisation(self):
-        from modules.treasureHuntBot import TreasureHuntHelper
-        ag.PAUSE = 0
-        self.packetRead = TreasureHuntHelper(self.botting).packetRead
-        self.load()
     
-    def hdvListInitialisation(self):
-        from modules.hdvListing import packetRead
-        ag.PAUSE = 0.3
-        self.packetRead = packetRead
+    def initilisation(self, action, pause = 0):
+        ag.PAUSE = pause
+        self.packetRead = action
         self.load()
 
     def load(self):
@@ -105,7 +98,8 @@ class GraphicalInterface():
                     sg.Radio("Treasure Hunt Helper", group_id = "CHOICE", key = 'huntHelper')
                 ],
                 [
-                    sg.Radio("HDV Items Listing", group_id = "CHOICE", key = 'hdv')
+                    sg.Radio("HDV Items Listing", group_id = "CHOICE", key = 'hdv'),
+                    sg.Radio("Chat Searcher", group_id = "CHOICE", key = 'chat')
                 ],
                 [sg.Button("Launch", key = "LAUNCH", use_ttk_buttons = True)]
             ]
@@ -139,13 +133,19 @@ class GraphicalInterface():
                 self.startTreasureHuntUi()
             elif (self.userChoice == 'hdv'):
                 self.startHdvUi()
+            elif (self.userChoice == 'chat'):
+                self.startSearcherUi()
         except AttributeError:
             return
 
     def startTreasureHuntUi(self):
         global moduleWindow
-        self.treasureBotInitialisation()
+
+        from modules.treasureHuntBot import TreasureHuntHelper
+        self.initilisation(TreasureHuntHelper(self.botting).packetRead, 0)
+
         sg.theme('TreasureHunt')
+
         botLayout = [
             [
                 sg.Button(image_filename=imgList['on'], button_color=(sg.theme_background_color(
@@ -189,9 +189,9 @@ class GraphicalInterface():
 
     def startHdvUi(self):
         global moduleWindow
-        from modules.hdvListing import automatePrices
+        from modules.hdvListing import automatePrices, packetRead
 
-        self.hdvListInitialisation()
+        self.initilisation(packetRead, 0.3)
 
         headings = ['            ITEM            ', '(1) PRIX JOUEUR', '(1) PRIX HDV', '(10) PRIX JOUEUR', '(10) PRIX HDV', '(100) PRIX JOUEUR', '(100) PRIX HDV', 'DIFFERENCE']
 
@@ -231,6 +231,41 @@ class GraphicalInterface():
                 t.start()
         moduleWindow.close()
         
+    def startSearcherUi(self):
+        global moduleWindow
+        from modules.stringSearch import Searcher
+        sg.theme = 'HDV'
+        layout = [
+            [sg.Multiline(size = (50, 5),
+            key = '-INPUT-', 
+            background_color= '#696968', 
+            text_color = '#eec606', 
+            font = 'Lato')],
+            [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25',
+            '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
+        ]
+
+        moduleWindow = sg.Window('Chat Searcher', layout, finalize = True, element_justification= 'center')
+
+        loaded = False
+        searcher = Searcher()
+        while True:
+            event, values = moduleWindow.read()
+
+            if event == sg.WIN_CLOSED:
+                self.stop()
+                break
+            elif event == 'ON/OFF':
+                if not loaded:
+                    self.initilisation(searcher.packetRead, 0)
+                    loaded = True
+                else:
+                    self.load()
+                searcher.update(values['-INPUT-'])
+
+
+
+
     def dataUpdate(self, data, colors = None):
         moduleWindow['-TABLE-'].update(values = data, row_colors = colors)
         moduleWindow.bring_to_front()
