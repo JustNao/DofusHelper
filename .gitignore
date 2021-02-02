@@ -8,7 +8,7 @@ scripts/*
 sniffer/__pycache__/*
 sources/Ids
 sources/__pycache__/*
-treasureHunt/__pycache__/*
+modules/__pycache__/*
 ui/__pycache__/*
 packetInfo.txt
 .vscode/*

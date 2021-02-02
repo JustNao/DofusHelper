@@ -6,13 +6,16 @@ print('Sources imported !')
 
 class Searcher:
     def __init__(self, needle = '') -> None:
-        self.needle = needle.strip('\n')
+        self.update(needle)
 
     def packetRead(self, msg):
         if msg.id == 7831:
             packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
-            if self.needle.lower() in packet['content'].lower():
+            found = any(str.lower() in packet['content'].lower() for str in self.needle)
+            if found:
                 print(Fore.LIGHTBLUE_EX + packet['senderName'] + Fore.RESET, ':', packet['content'])
 
     def update(self, string):
-        self.needle = string.strip('\n')
+        needle = string.strip('\n')
+        needle = needle.split(';')
+        self.needle = needle

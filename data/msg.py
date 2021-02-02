@@ -55,16 +55,14 @@ class Msg:
             protocol.msg_from_id[id]
 
         except IndexError:
-            buf.pos = 0
-            logger.debug("Could not parse message: Not complete")
+            buf.pos = len(buf.data)
+            print("Flushing buffer, you may need to do the next step manually")
             return None
         except KeyError:
             buf.pos = len(buf.data)
-            print("KeyError :", id)
+            print("Flushing buffer, you may need to do the next step manually")
             return None
         else:
-            # if id not in interestingPackets:
-            #     return Msg(id, None, count)
             if id == 2:
                 logger.debug("Message is NetworkDataContainerMessage! Uncompressing...")
                 newbuffer = Buffer(data.readByteArray())
