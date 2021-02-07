@@ -101,7 +101,10 @@ class GraphicalInterface():
                     sg.Radio("HDV Items Listing", group_id = "CHOICE", key = 'hdv'),
                     sg.Radio("Chat Searcher", group_id = "CHOICE", key = 'chat')
                 ],
-                [sg.Radio("Multicompte Tool", group_id = "CHOICE", key = 'multi')],
+                [
+                    sg.Radio("Multicompte Tool", group_id = "CHOICE", key = 'multi'),
+                    sg.Radio("AvA Counter", group_id = "CHOICE", key = 'ava')
+                ],
                 [sg.Button("Launch", key = "LAUNCH", use_ttk_buttons = True)]
             ]
 
@@ -138,6 +141,9 @@ class GraphicalInterface():
                 self.startSearcherUi()
             elif (self.userChoice == 'multi'):
                 self.startMulticompteUi()
+            elif (self.userChoice == 'ava'):
+                from modules.avaCounter import packetRead
+                self.initilisation(packetRead, 0)
         except AttributeError:
             return
 

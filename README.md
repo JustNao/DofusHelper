@@ -42,6 +42,10 @@ Cliquer sur le bouton 'Automate Prices' va actualiser tous les items dont la dif
 
 Scan tous les messages du chat à la recherche de la chaîne de caractère donnée en input. Renvoie le message avec le nom du personnage dans la console.
 
+### AvA Counter
+
+Une fois lancé, à chaque changement de map un comptage des joueurs présents par alliance sera fait (utile en cas de AvA où des piles sont faites pour compter le nomber de joueurs).
+
 ### Fail Safe
 
 Dans n'importe quel module, quand le bot pixel est utilisé, placer la souris dans le coin supérieur gauche de l'écran stoppera le bot (il faudra relancer l'application pour relancer le bot).
