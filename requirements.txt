@@ -5,3 +5,4 @@ colorama
 pyautogui
 pysimplegui
 pillow
+pywin32

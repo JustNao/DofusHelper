@@ -192,7 +192,7 @@ class TreasureHuntHelper():
     def mapContentAnalyse(self, packet):
         for actor in packet["actors"]:
             if (actor['__type__'] == "GameRolePlayTreasureHintInformations"):
-                if (actor['npcId'] == self.phorreur['npcId']):
+                if (actor['npcId'] == self.phorreur['npcId'] and (self.phorreur['lookingFor'] == True)):
                     print(Fore.GREEN + "Phorreur found !" + Fore.RESET)
                     self.phorreur['lookingFor'] = False
                     self.hintPos = self.Hint(

@@ -101,6 +101,7 @@ class GraphicalInterface():
                     sg.Radio("HDV Items Listing", group_id = "CHOICE", key = 'hdv'),
                     sg.Radio("Chat Searcher", group_id = "CHOICE", key = 'chat')
                 ],
+                [sg.Radio("Multicompte Tool", group_id = "CHOICE", key = 'multi')],
                 [sg.Button("Launch", key = "LAUNCH", use_ttk_buttons = True)]
             ]
 
@@ -135,6 +136,8 @@ class GraphicalInterface():
                 self.startHdvUi()
             elif (self.userChoice == 'chat'):
                 self.startSearcherUi()
+            elif (self.userChoice == 'multi'):
+                self.startMulticompteUi()
         except AttributeError:
             return
 
@@ -263,7 +266,36 @@ class GraphicalInterface():
                     self.load()
                 searcher.update(values['-INPUT-'])
 
+    def startMulticompteUi(self):
+        global moduleWindow
+        from modules.multicompte import Multicompte
+        sg.theme = 'HDV'
+        layout = [
+            [sg.Multiline(size = (30, 3),
+            key = '-INPUT-', 
+            background_color= '#696968', 
+            text_color = '#eec606', 
+            font = 'Lato')],
+            [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25',
+            '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
+        ]
 
+        moduleWindow = sg.Window('Chat Searcher', layout, finalize = True, element_justification= 'center')
+
+        loaded = False
+        while True:
+            event, values = moduleWindow.read()
+
+            if event == sg.WIN_CLOSED:
+                self.stop()
+                break
+            elif event == 'ON/OFF':
+                manager = Multicompte(values['-INPUT-'])
+                if not loaded:
+                    self.initilisation(manager.packetRead, 0)
+                    loaded = True
+                else:
+                    self.load()
 
 
     def dataUpdate(self, data, colors = None):
@@ -294,20 +326,18 @@ class GraphicalInterface():
 
     def clickNextStep(self):
         currentX, currentY = ag.position()
-        while True:
-            try:
-                if self.found == "found":
-                    pos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\' + 'flag.png', grayscale=True, confidence=.8)
-                    ag.leftClick(pos[0], pos[1])
-                elif self.found == "checkpoint":
-                    pos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\' + 'checkpoint.png', grayscale=True, confidence=.8)
-                    ag.leftClick(pos[0], pos[1])
-                elif self.found == "combat":
-                    pos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\' + 'combat.png', grayscale=True, confidence=.8)
-                    ag.leftClick(pos[0], pos[1])
-                break
-            except AttributeError:
-                print("No next step detected, will try in a second")
+        try:
+            if self.found == "found":
+                pos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\' + 'flag.png', grayscale=True, confidence=.8)
+                ag.leftClick(pos[0], pos[1])
+            elif self.found == "checkpoint":
+                pos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\' + 'checkpoint.png', grayscale=True, confidence=.8)
+                ag.leftClick(pos[0], pos[1])
+            elif self.found == "combat":
+                pos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\' + 'combat.png', grayscale=True, confidence=.8)
+                ag.leftClick(pos[0], pos[1])
+        except TypeError:
+            print("No next step detected, need to do it manually")
 
         ag.moveTo(currentX, currentY)
         self.found = None

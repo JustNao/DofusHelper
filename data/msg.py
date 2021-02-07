@@ -2,7 +2,7 @@ import logging
 
 from .binrw import Data, Buffer
 from sniffer import protocol
-
+from colorama import Fore
 
 logger = logging.getLogger("labot")
 
@@ -55,12 +55,13 @@ class Msg:
             protocol.msg_from_id[id]
 
         except IndexError:
-            buf.pos = len(buf.data)
-            print("Flushing buffer, you may need to do the next step manually")
+            buf.pos = 0
+            logger.debug('Multi packet message')
             return None
         except KeyError:
-            buf.pos = len(buf.data)
-            print("Flushing buffer, you may need to do the next step manually")
+            buf.pos = len(buf)
+            print(Fore.LIGHTMAGENTA_EX + 'Key Error, flushing buffer (may need to manually do the action)' + Fore.RESET)
+            # print("Flushing buffer, you may need to do the next step manually")
             return None
         else:
             if id == 2:
