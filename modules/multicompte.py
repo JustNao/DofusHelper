@@ -1,21 +1,32 @@
 print('Importing sources ...')
 
+from typing import Type
+from pywinauto.findbestmatch import find_best_match
 from sniffer import protocol
 from colorama import Fore
 from pywinauto.findwindows import find_window
 from win32 import win32gui
 import win32com.client as client
+import pyautogui as ag
 print('Sources imported !')
 
-class Multicompte:
-    def __init__(self, characterList) -> None:
-        bad_chars = ' \n'
-        fullCharacaterList = characterList
-        for c in bad_chars: 
-            fullCharacaterList = fullCharacaterList.replace(c, "")
-        self.charactersName = fullCharacaterList.split(',')
+class Perso:
+    def __init__(self, id = 0, mule = False):
+        self.id = id
+        self.mule = mule
 
-        self.characterId = {}
+class Multicompte:
+
+    def __init__(self, userChoice) -> None:
+        bad_chars = ' \n'
+
+        self.characters = {}
+        for i in range(8):
+            if userChoice['I' + str(i)] != '':
+                self.characters[userChoice['I' + str(i)]] = Perso(mule = userChoice['CB' + str(i)])
+            else:
+                break
+
         self.top_windows = []
         win32gui.EnumWindows(self.windowEnumerationHandler, self.top_windows)
 
@@ -28,7 +39,7 @@ class Multicompte:
             packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
             try:
                 for teamMember in packet['team']['teamMembers']:
-                    self.characterId[teamMember['id']] = teamMember['name']
+                    self.characters[teamMember['name']].id = teamMember['id']
             except KeyError:
                 pass
         elif msg.id == 9013:
@@ -36,8 +47,17 @@ class Multicompte:
             try:
                 shell = client.Dispatch("WScript.Shell")
                 shell.SendKeys('%')
-                win32gui.SetForegroundWindow(find_window(title=self.characterId[packet['id']] + ' - Dofus 2.58.5.8'))
+                name = self.idToName(packet['id'])
+                win32gui.SetForegroundWindow(find_window(best_match = name + ' - Dofus'))
+                if self.characters[name].mule:
+                    ag.typewrite(['v'])
             except KeyError:
                 pass
+            except TypeError:
+                pass
 
+    def idToName(self, id):
+        for character in self.characters:
+            if self.characters[character].id == id:
+                return character
 # Epoque, Taty-Citron

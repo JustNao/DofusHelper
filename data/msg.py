@@ -41,6 +41,7 @@ class Msg:
         empty the beginning of the buffer.
         """
         id = 0
+        lenData = 0
         if not buf:
             return
         try:

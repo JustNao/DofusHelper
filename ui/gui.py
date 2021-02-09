@@ -1,5 +1,5 @@
 from tkinter import TclError
-from tkinter.constants import CENTER, DISABLED, RIGHT
+from tkinter.constants import CENTER, DISABLED, RIGHT, LEFT
 import PySimpleGUI as sg
 import os, sys
 import threading
@@ -27,10 +27,10 @@ class GraphicalInterface():
                                                   'PROGRESS_DEPTH': 0}
 
         sg.LOOK_AND_FEEL_TABLE['HDV'] = {'BACKGROUND': '#2c2e25',
-                                                  'TEXT': '#676866',
+                                                  'TEXT': '#a3a3a3',
                                                   'INPUT': '#676866',
                                                   'SCROLL': '#E3E3E3',
-                                                  'TEXT_INPUT': '#676866',
+                                                  'TEXT_INPUT': '#eec606',
                                                   'BUTTON': ('black', '#bcd800'),
                                                   'PROGRESS': '#bcd800',
                                                   'BORDER': 1,
@@ -90,22 +90,24 @@ class GraphicalInterface():
                    f for f in os.listdir(imgFolder) if '.png' in f}
 
         # MENU #
-        sg.theme('DarkBlue')
+        sg.theme('HDV')
+
+        firstColumn = [
+                    [sg.Radio("Treasure Hunt Bot", default = True, group_id = "CHOICE", key = 'huntBot')],
+                    [sg.Radio("Treasure Hunt Helper", group_id = "CHOICE", key = 'huntHelper')],
+                    [sg.Radio("HDV Items Listing", group_id = "CHOICE", key = 'hdv')]
+        ]
+        
+        secondColumn = [
+                    [sg.Radio("Chat Searcher", group_id = "CHOICE", key = 'chat')],
+                    [sg.Radio("Multicompte Tool", group_id = "CHOICE", key = 'multi')],
+                    [sg.Radio("AvA Counter", group_id = "CHOICE", key = 'ava')]
+        ]
 
         menuLayout =[
-                [
-                    sg.Radio("Treasure Hunt Bot", default = True, group_id = "CHOICE", key = 'huntBot'),
-                    sg.Radio("Treasure Hunt Helper", group_id = "CHOICE", key = 'huntHelper')
-                ],
-                [
-                    sg.Radio("HDV Items Listing", group_id = "CHOICE", key = 'hdv'),
-                    sg.Radio("Chat Searcher", group_id = "CHOICE", key = 'chat')
-                ],
-                [
-                    sg.Radio("Multicompte Tool", group_id = "CHOICE", key = 'multi'),
-                    sg.Radio("AvA Counter", group_id = "CHOICE", key = 'ava')
-                ],
-                [sg.Button("Launch", key = "LAUNCH", use_ttk_buttons = True)]
+                    [sg.Column(firstColumn),
+                    sg.Column(secondColumn)],
+                    [sg.Button("Launch", key = "LAUNCH", use_ttk_buttons = True)]
             ]
 
         menuWindow = sg.Window(
@@ -115,7 +117,7 @@ class GraphicalInterface():
             border_depth=3,
             keep_on_top=False,
             finalize=True,
-            element_justification=CENTER,
+            element_justification= 'center',
             icon = application_path + '\\..\\sources\\img\\icon\\phoenix.ico',
             use_default_focus = False
             )
@@ -180,7 +182,7 @@ class GraphicalInterface():
             keep_on_top=True,
             finalize=True,
             alpha_channel=.85,
-            element_justification=CENTER)
+            element_justification = CENTER)
 
         while True:
             event, values = moduleWindow.read(timeout=15000)
@@ -275,28 +277,30 @@ class GraphicalInterface():
     def startMulticompteUi(self):
         global moduleWindow
         from modules.multicompte import Multicompte
-        sg.theme = 'HDV'
-        layout = [
-            [sg.Multiline(size = (30, 3),
-            key = '-INPUT-', 
-            background_color= '#696968', 
-            text_color = '#eec606', 
-            font = 'Lato')],
-            [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25',
-            '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
-        ]
 
-        moduleWindow = sg.Window('Chat Searcher', layout, finalize = True, element_justification= 'center')
+        def rowElement(ind):
+            return [[sg.In('', k = 'I' + f'{ind}', size =(15, 0)), sg.Checkbox('Mule', k = 'CB' + f'{ind}')]] 
 
+        layout = [[sg.Column(rowElement(i), visible = False, k = 'ROW' + f'{i}')] for i in range(8)]
+        layout += [[sg.Button('Add character', key = '-ADD-')]]
+        layout += [[sg.Button(image_filename=imgList['off'], button_color=('#2c2e25',
+            '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]]
+        moduleWindow = sg.Window('Multicompte Tool', layout, element_justification = 'center')
+
+        characterInd = 0
         loaded = False
+
         while True:
             event, values = moduleWindow.read()
 
             if event == sg.WIN_CLOSED:
                 self.stop()
                 break
+            elif (event == '-ADD-') and (characterInd < 8):
+                moduleWindow['ROW' + str(characterInd)].update(visible = True)
+                characterInd += 1
             elif event == 'ON/OFF':
-                manager = Multicompte(values['-INPUT-'])
+                manager = Multicompte(values)
                 if not loaded:
                     self.initilisation(manager.packetRead, 0)
                     loaded = True

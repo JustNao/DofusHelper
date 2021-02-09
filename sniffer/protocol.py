@@ -41,7 +41,10 @@ def readVec(var, data):
 
 def read(type, data: Data):
     if type is False:
-        type = types_from_id[data.readUnsignedShort()]
+        try:
+            type = types_from_id[data.readUnsignedShort()]
+        except KeyError:
+            return None
     elif isinstance(type, str):
         if type in primitives:
             return primitives[type][0](data)

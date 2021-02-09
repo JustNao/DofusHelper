@@ -1,4 +1,4 @@
-# Dofus Helper
+# Dofus Help Manager
 
 Repo pour diffuser le bot (projet perso).
 
@@ -40,7 +40,11 @@ Cliquer sur le bouton 'Automate Prices' va actualiser tous les items dont la dif
 
 ### Chat Searcher
 
-Scan tous les messages du chat à la recherche de la chaîne de caractère donnée en input. Renvoie le message avec le nom du personnage dans la console.
+Scan tous les messages du chat à la recherche de la chaîne de caractère donnée en input. Renvoie le message avec le nom du personnage dans la console. Plusieurs éléments de recherche sont possibles, en les séparant avec un ';'.
+
+### Multicompte Tool
+
+A chaque début de tour dans un combat, ouvre la fenêtre du joueur correspondant. Rentrer dans DHM la liste de tous les personnages jouables, séparés par une virgule ','.
 
 ### AvA Counter
 
