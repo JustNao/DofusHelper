@@ -44,7 +44,7 @@ Scan tous les messages du chat à la recherche de la chaîne de caractère donn�
 
 ### Multicompte Tool
 
-A chaque début de tour dans un combat, ouvre la fenêtre du joueur correspondant. Rentrer dans DHM la liste de tous les personnages jouables, séparés par une virgule ','.
+A chaque début de tour dans un combat, ouvre la fenêtre du joueur correspondant. Rentrer dans DHM la liste de tous les personnages jouables. Si la case 'Mule' est cochée, la touche 'V' sera appuyée au changement de fenêtre (raccourci pour passer le tour dans mon cas).
 
 ### AvA Counter
 
