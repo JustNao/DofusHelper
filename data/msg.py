@@ -54,6 +54,7 @@ class Msg:
             id = header >> 2
             data = Data(buf.read(lenData))
             protocol.msg_from_id[id]
+            # print("Packet received: ", protocol.msg_from_id[id])
 
         except IndexError:
             buf.pos = 0

@@ -22,8 +22,8 @@ class TreasureHuntHelper():
         DEBUG = False
         print("Treasure helper initialized")
         self.botting = bot
-        # MapChange, TreasureStep, TreasurePOI, TreasureHinT, MapComplementaryInfo, FightStart
-        self.interestingPackets = [2889, 5745, 7529, 9917, 2291, 4119, 9401]
+        # CurrentMap, TreasureHuntMessage, TreasurePOI, TreasureHinT, MapComplementaryInformationsDataMessage, FightStart
+        self.interestingPackets = [7033, 3696, 7529, 9917, 2291, 5072, 9401]
         self.playerPos = self.Position()
         self.hintPos = self.Hint()
         self.timeStart = None
@@ -119,11 +119,11 @@ class TreasureHuntHelper():
             except KeyError:
                 print("KeyError ", msg.id)
                 return
-            if msg.id == 2889:  # Changement de Map
+            if msg.id == 7033:  # Changement de Map
                 self.changeMap(packet)
-            elif msg.id == 5745:  # Nouvelle étape de chasse aux trésors
+            elif msg.id == 3696:  # Nouvelle étape de chasse aux trésors
                 self.huntNewStep(packet)
-            elif (msg.id == 2291):  # Chargement de carte, recherche d'un phorreur
+            elif (msg.id == 5072):  # Chargement de carte, recherche d'un phorreur
                 self.mapContentAnalyse(packet)
             elif (msg.id == (4119 or 9401)):
                 # En entrant en combat, on met en pause le sniffer pour éviter les problèmes
