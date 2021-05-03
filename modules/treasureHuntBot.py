@@ -180,7 +180,7 @@ class TreasureHuntHelper():
                 g.ui.changeImg("found")
                 g.ui.changeDirection()
                 self.direction = "stay"
-                time.sleep(0.5)
+                time.sleep(1)
                 if self.botting:
                     g.ui.clickNextStep()
 

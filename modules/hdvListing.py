@@ -127,7 +127,8 @@ def getCurrentPrice(packet):
 
 def packetRead(msg):
     global sellsList, index, posSearch, sellInfoPos, middleElementPos
-    if msg.id == 3101:
+    if msg.id == 8157:
+        # ExchangeStartedSellerMessage
         packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
         getCurrentSells(packet)
         index = 1
@@ -147,7 +148,8 @@ def packetRead(msg):
         ag.hotkey("ctrl", "v")
         ag.click(sellInfoPos)
 
-    elif msg.id == 2041:
+    elif msg.id == 4848:
+        # ExchangeBidPriceForSellerMessage
         packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
         getCurrentPrice(packet)
 
@@ -199,9 +201,12 @@ def automatePrices(threshold):
                     while (ouiPos is None) and (searchIndex < 5):
                         searchIndex += 1
                         time.sleep(0.1)
-                        ouiPos = ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\oui.png')
+                        ouiPos = ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\oui.png', confidence = 0.75)
                     if ouiPos is not None:
                         ag.click(ouiPos)
+                    else:
+                        print("Can't click on confirm, you have 3 seconds to click")
+                        time.sleep(3)
         index += 1
         ui.updateProgressBar((index/len(sells)*100))
     print(Fore.GREEN + 'Item pricing done !' + Fore.RESET)
