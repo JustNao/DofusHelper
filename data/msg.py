@@ -61,9 +61,8 @@ class Msg:
             logger.debug('Multi packet message')
             return None
         except KeyError:
-            print(len(buf))
             buf.pos = len(buf)
-            print(Fore.LIGHTMAGENTA_EX + 'Key Error, flushing buffer (may need to manually do the action)' + Fore.RESET)
+            # print(Fore.LIGHTMAGENTA_EX + 'Key Error, flushing buffer (may need to manually do the action)' + Fore.RESET)
             return None
         else:
             if id == 2:
