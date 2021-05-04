@@ -1,7 +1,7 @@
 all_widgets.py
 main.spec
 nomansland.py
-*json
+safekeep.json
 __pycache__/*
 data/__pycache__/*
 scripts/*

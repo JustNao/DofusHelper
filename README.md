@@ -9,10 +9,7 @@ Repo pour diffuser le bot (projet perso).
 'C:\Program Files\Python39\Scripts'.
 2. Installer [Npcap](https://nmap.org/npcap/)
 2. Exporter le git (bash, zip, ...)
-3. Ouvrir une invite de commande / terminal et taper
-```bash
-pip install -r requirements.txt
-```
+3. Lancer setup.bat
 
 ## Utilisation
 
