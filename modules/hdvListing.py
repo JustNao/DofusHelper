@@ -169,6 +169,8 @@ def automatePrices(threshold):
             itemNumber = 0
             for unit in range(2,-1,-1):
                 if (item['playerAmount'].count[unit]['quantity'] == 0) or (item['playerAmount'].count[unit]['postedPrice'] - item['hdvAmount'][unit] == 0):
+                    for i in range(item['playerAmount'].count[unit]['quantity']):
+                        positionShift += 43
                     continue
                 else:
                     ag.click(posSearch)
@@ -205,7 +207,7 @@ def automatePrices(threshold):
                     if ouiPos is not None:
                         ag.click(ouiPos)
                     else:
-                        print("Can't click on confirm, you have 3 seconds to click")
+                        print("If there is a confirmation popup, i can't detect it. Otherwise, nothing is wrong, a single item just doesn't require confirmation")
                         time.sleep(3)
         index += 1
         ui.updateProgressBar((index/len(sells)*100))
