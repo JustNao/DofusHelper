@@ -95,7 +95,8 @@ class GraphicalInterface():
         firstColumn = [
                     [sg.Radio("Treasure Hunt Bot", default = True, group_id = "CHOICE", key = 'huntBot')],
                     [sg.Radio("Treasure Hunt Helper", group_id = "CHOICE", key = 'huntHelper')],
-                    [sg.Radio("HDV Items Listing", group_id = "CHOICE", key = 'hdv')]
+                    [sg.Radio("HDV Items Listing", group_id = "CHOICE", key = 'hdv')],
+                    [sg.Radio("HDV Missing Items", group_id = "CHOICE", key = 'hdvMissing')]
         ]
         
         secondColumn = [
@@ -145,6 +146,9 @@ class GraphicalInterface():
                 self.startMulticompteUi()
             elif (self.userChoice == 'ava'):
                 from modules.avaCounter import packetRead
+                self.initilisation(packetRead, 0)
+            elif (self.userChoice == 'hdvMissing'):
+                from modules.hdvMissingItems import packetRead
                 self.initilisation(packetRead, 0)
         except AttributeError:
             return
