@@ -13,7 +13,7 @@ def packetRead(msg):
     if msg.id == 7549:
         packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
         missingItems = []
-        for item in gameItems[packet['objectType']]:
+        for item in gameItems[str(packet['objectType'])]:
             if item not in packet['typeDescription']:
                 missingItems.append(item)
                 print(Fore.GREEN + itemToName[item] + Fore.RESET)
