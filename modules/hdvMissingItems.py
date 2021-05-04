@@ -2,9 +2,6 @@ print('Importing sources ...')
 
 from sniffer import protocol
 from colorama import Fore
-from pywinauto.findwindows import find_window
-from win32 import win32gui
-import win32com.client as client
 from sources.item import gameItems, itemToName
 print('Sources imported !')
 
@@ -14,6 +11,6 @@ def packetRead(msg):
         packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
         missingItems = []
         for item in gameItems[str(packet['objectType'])]:
-            if item not in packet['typeDescription']:
+            if item['id'] not in packet['typeDescription'] and item['craftable']:
                 missingItems.append(item)
-                print(Fore.GREEN + itemToName[item] + Fore.RESET)
+                print(Fore.BLUE + str(item['level']) + " " + Fore.GREEN + itemToName[item['id']] + Fore.RESET)
