@@ -9,7 +9,8 @@ print('Sources imported !')
 
 
 def packetRead(msg):
-    if msg.id == 2291:
+    if msg.id == 5072:
+        # MapComplementaryInformationsDataMessage
         charactersOnMap = {}
         packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
         for perso in packet['actors']:
