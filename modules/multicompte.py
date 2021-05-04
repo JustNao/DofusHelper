@@ -35,14 +35,17 @@ class Multicompte:
 
     
     def packetRead(self, msg):
-        if msg.id == 5570:
+        if msg.id == 9871:
+            # ~GameSynchronizingMessage
             packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
             try:
-                for teamMember in packet['team']['teamMembers']:
-                    self.characters[teamMember['name']].id = teamMember['id']
+                for entity in packet['fighters']:
+                    if entity['__type__'] == 'GameFightCharacterInformations':
+                        self.characters[entity['name']].id = entity['contextualId']
             except KeyError:
                 pass
-        elif msg.id == 9013:
+        elif msg.id == 4730:
+            # GameFightTurnStartMessage
             packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
             try:
                 shell = client.Dispatch("WScript.Shell")
@@ -60,4 +63,4 @@ class Multicompte:
         for character in self.characters:
             if self.characters[character].id == id:
                 return character
-# Epoque, Taty-Citron
+# Epoque, Imminent

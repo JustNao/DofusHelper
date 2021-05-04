@@ -47,8 +47,6 @@ class Data:
     def verif(self, l):
         if len(self) < self.pos + l:
             raise IndexError(self.pos, l, len(self))
-        elif len(self.data) > 5000:
-            raise KeyError
 
     def reset_pos(self):
         self.pos = 0
