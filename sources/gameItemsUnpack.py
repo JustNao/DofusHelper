@@ -10,7 +10,7 @@ for item in itemJs:
             'id' : item['id'],
             'nameId' : item['nameId'],
             'level' : item['level'],
-            'craftable': len(item['recipeIds']) > 0
+            'craftable': item['recipeSlots'] > 0
             })
     except KeyError:
         gameItems[item['typeId']] = [
@@ -18,7 +18,7 @@ for item in itemJs:
             'id' : item['id'],
             'nameId' : item['nameId'],
             'level' : item['level'],
-            'craftable': len(item['recipeIds']) > 0
+            'craftable': item['recipeSlots'] > 0
             }
         ]
 with open('sources/gameRessources/gameItems.json', 'w') as out:
