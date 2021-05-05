@@ -36,6 +36,7 @@ class GraphicalInterface():
                                                   'BORDER': 1,
                                                   'SLIDER_DEPTH': 0,
                                                   'PROGRESS_DEPTH': 0}
+        sg.set_options(suppress_raise_key_errors=True)
     
     def initilisation(self, action, pause = 0):
         ag.PAUSE = pause
@@ -51,17 +52,15 @@ class GraphicalInterface():
             except NameError:
                 pass
         else:
-            self.stop() 
+            self.stop(toggle = True) 
 
-    def stop(self):
+    def stop(self, toggle = False):
         if self.stopSniff is not None:
             self.stopSniff()
             self.stopSniff = None
             print(Fore.YELLOW + "Module stopped" + Fore.RESET)
-            try:
+            if toggle:
                 moduleWindow['ON/OFF'].update(image_filename=imgList['off'])
-            except NameError or TclError:
-                pass 
             
     def startUi(self):
         t = threading.Thread(target=self.buildUi, name="GUI")
@@ -195,7 +194,7 @@ class GraphicalInterface():
             elif event == "ON/OFF":
                 self.load()
             elif (event == sg.WIN_CLOSED) or (event == "EXIT"):
-                self.stop()
+                self.stop(toggle = True)
                 break
             moduleWindow.refresh()
 
@@ -233,7 +232,7 @@ class GraphicalInterface():
         while True:
             event, values = moduleWindow.read()
             if event == sg.WIN_CLOSED:
-                self.stop()
+                self.stop(toggle = True)
                 break
             elif event == "ON/OFF":
                 self.load()
@@ -267,7 +266,7 @@ class GraphicalInterface():
             event, values = moduleWindow.read()
 
             if event == sg.WIN_CLOSED:
-                self.stop()
+                self.stop(toggle = True)
                 break
             elif event == 'ON/OFF':
                 if not loaded:
@@ -336,9 +335,11 @@ class GraphicalInterface():
             event, values = moduleWindow.read()
 
             if event == sg.WIN_CLOSED:
+                self.stop()
                 break
             elif event == "save":
                 missingItems.saveMissingItems()
+                self.stop()
                 break
 
         moduleWindow.close()

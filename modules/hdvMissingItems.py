@@ -3,7 +3,7 @@ print('Importing sources ...')
 from sniffer import protocol
 from openpyxl import load_workbook
 from itertools import islice
-import time
+import time, datetime
 from colorama import Fore
 from sources.item import gameItems, itemToName
 print('Sources imported !')
@@ -14,7 +14,13 @@ class MissingItemLookup:
         self._filename = 'output/missingItems.xlsx'
         self._wb = load_workbook(self._filename)
         self._alreadyMissingItems = {}
+
+        currentDateFormatted = str(datetime.datetime.today().strftime ('%d-%m-%Y')) # format the date to ddmmyyyy
+        self._nextDayDateFormatted = (datetime.datetime.today() + datetime.timedelta(days=1)).strftime ('%d-%m-%Y') # format the date to ddmmyyyy
+        self._isNextDay = (self._wb['Coiffe']['I1'].value == currentDateFormatted)
+        
         for sheetName in self._wb.sheetnames:
+            self._wb[sheetName]['I1'].value = self._nextDayDateFormatted
             sheet = self._wb[sheetName]
             self._alreadyMissingItems[sheetName] = []
             for row in islice(sheet.values, 1, sheet.max_row):
@@ -72,14 +78,17 @@ class MissingItemLookup:
                 dayCount = 0
 
                 #  Checking if the item was already missing
-                for itemAlreadyMissing in self._alreadyMissingItems[itemType]:
-                    if itemAlreadyMissing['name'] == item['name']:
-                        dayCount = itemAlreadyMissing['days'] + 1
-                        break
-
-                self._wb[itemType]['A' + str(currentRow)] = item['level']
-                self._wb[itemType]['B' + str(currentRow)] = itemToName[item['id']]      
-                self._wb[itemType]['D' + str(currentRow)] = dayCount
+                if self._isNextDay:
+                    for itemAlreadyMissing in self._alreadyMissingItems[itemType]:
+                        if itemAlreadyMissing['name'] == item['name']:
+                            dayCount = itemAlreadyMissing['days'] + 1
+                            break
+                
+                effects = ', '.join(item['effects'])
+                self._wb[itemType]['A' + str(currentRow)].value = item['level']
+                self._wb[itemType]['B' + str(currentRow)].value = itemToName[item['id']]      
+                self._wb[itemType]['C' + str(currentRow)].value = effects      
+                self._wb[itemType]['D' + str(currentRow)].value = dayCount
                 currentRow += 1
             self._wb[itemType].delete_rows(currentRow, 200)
         saved = False
