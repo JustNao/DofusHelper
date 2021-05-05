@@ -148,8 +148,7 @@ class GraphicalInterface():
                 from modules.avaCounter import packetRead
                 self.initilisation(packetRead, 0)
             elif (self.userChoice == 'hdvMissing'):
-                from modules.hdvMissingItems import packetRead
-                self.initilisation(packetRead, 0)
+                self.startMissingItemsUi()
         except AttributeError:
             return
 
@@ -310,6 +309,40 @@ class GraphicalInterface():
                     loaded = True
                 else:
                     self.load()
+
+    def startMissingItemsUi(self):
+        global moduleWindow
+        from modules.hdvMissingItems import MissingItemLookup
+        missingItems = MissingItemLookup()
+        self.initilisation(missingItems.packetRead, 0)
+
+
+        sg.theme = 'HDV'
+        layout = [
+            [sg.Button(button_text="Save", border_width=0, key="save", pad=(10, 0))]
+        ]
+
+        moduleWindow = sg.Window(
+            'Missing Items Excel', 
+            layout, 
+            finalize = True, 
+            element_justification= 'center',
+            grab_anywhere=True,
+            keep_on_top=True,
+            use_default_focus = False
+            )
+
+        while True:
+            event, values = moduleWindow.read()
+
+            if event == sg.WIN_CLOSED:
+                break
+            elif event == "save":
+                missingItems.saveMissingItems()
+                break
+
+        moduleWindow.close()
+
 
 
     def dataUpdate(self, data, colors = None):

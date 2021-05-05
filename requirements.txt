@@ -7,3 +7,4 @@ pysimplegui
 pillow
 pywin32
 pywinauto
+openpyxl
