@@ -172,16 +172,6 @@ def automatePrices(threshold):
     except AttributeError:
         pass
     for key in sellsList:
-
-        # Checking if item names are similar, in which case some problems may occur down the line
-        tooRisky = False
-        for iteratedKey in sellsList:
-            if (key != iteratedKey) and ((itemToName[key] in itemToName[iteratedKey]) or (itemToName[iteratedKey] in itemToName[key])):
-                tooRisky = True
-                break
-        if tooRisky:
-            continue   
-
         item = key[1]
         itemNumber = 0
         if item['dif'] > threshold :
