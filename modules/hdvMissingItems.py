@@ -53,8 +53,10 @@ class MissingItemLookup:
             19: 'Arme',
             21: 'Arme',
             22: 'Arme',
-            114: 'Arme'
+            114: 'Arme',
+            151: 'Trophée'
         }
+
         self._missingItems = {}
         for type in self._idToType.values():
             try:
@@ -79,11 +81,13 @@ class MissingItemLookup:
                 dayCount = 0
 
                 #  Checking if the item was already missing, only if it's not the same day
-                if not self._isCurrentDay:
-                    for itemAlreadyMissing in self._alreadyMissingItems[itemType]:
-                        if itemAlreadyMissing['name'] == itemToName[item['id']]:
+                for itemAlreadyMissing in self._alreadyMissingItems[itemType]:
+                    if itemAlreadyMissing['name'] == itemToName[item['id']]:
+                        if not self._isCurrentDay:
                             dayCount = itemAlreadyMissing['days'] + 1
-                            break
+                        else:
+                            dayCount = itemAlreadyMissing['days']
+                        break
                 
                 effects = ', '.join(item['effects'])
                 self._wb[itemType]['A' + str(currentRow)].value = item['level']
