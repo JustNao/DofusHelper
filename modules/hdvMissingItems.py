@@ -16,11 +16,10 @@ class MissingItemLookup:
         self._alreadyMissingItems = {}
 
         currentDateFormatted = str(datetime.datetime.today().strftime ('%d-%m-%Y')) # format the date to ddmmyyyy
-        self._nextDayDateFormatted = (datetime.datetime.today() + datetime.timedelta(days=1)).strftime ('%d-%m-%Y') # format the date to ddmmyyyy
-        self._isNextDay = (self._wb['Coiffe']['I1'].value == currentDateFormatted)
+        self._isCurrentDay = (self._wb['Coiffe']['I1'].value == currentDateFormatted)
         
         for sheetName in self._wb.sheetnames:
-            self._wb[sheetName]['I1'].value = self._nextDayDateFormatted
+            self._wb[sheetName]['I1'].value = currentDateFormatted
             sheet = self._wb[sheetName]
             self._alreadyMissingItems[sheetName] = []
             for row in islice(sheet.values, 1, sheet.max_row):
@@ -72,15 +71,15 @@ class MissingItemLookup:
                     self._missingItems[self._idToType[packet['objectType']]].append(item)
             print("Catégorie " + Fore.CYAN + self._idToType[packet['objectType']] + Fore.RESET + " ajoutée")    
     def saveMissingItems(self):
-        if self._isNextDay:
+        if not self._isCurrentDay:
             print(Fore.LIGHTMAGENTA_EX + "Getting old items" + Fore.RESET)
         for itemType, itemList in self._missingItems.items():
             currentRow = 2
             for item in itemList:
                 dayCount = 0
 
-                #  Checking if the item was already missing
-                if self._isNextDay:
+                #  Checking if the item was already missing, only if it's not the same day
+                if not self._isCurrentDay:
                     for itemAlreadyMissing in self._alreadyMissingItems[itemType]:
                         if itemAlreadyMissing['name'] == itemToName[item['id']]:
                             dayCount = itemAlreadyMissing['days'] + 1
