@@ -14,3 +14,4 @@ packetInfo.txt
 .vscode/*
 uiTest.py
 sources/gameRessources/Items.json
+*xlsx

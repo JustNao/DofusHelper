@@ -72,6 +72,8 @@ class MissingItemLookup:
                     self._missingItems[self._idToType[packet['objectType']]].append(item)
             print("Catégorie " + Fore.CYAN + self._idToType[packet['objectType']] + Fore.RESET + " ajoutée")    
     def saveMissingItems(self):
+        if self._isNextDay:
+            print(Fore.LIGHTMAGENTA_EX + "Getting old items" + Fore.RESET)
         for itemType, itemList in self._missingItems.items():
             currentRow = 2
             for item in itemList:
@@ -80,7 +82,7 @@ class MissingItemLookup:
                 #  Checking if the item was already missing
                 if self._isNextDay:
                     for itemAlreadyMissing in self._alreadyMissingItems[itemType]:
-                        if itemAlreadyMissing['name'] == item['name']:
+                        if itemAlreadyMissing['name'] == itemToName[item['id']]:
                             dayCount = itemAlreadyMissing['days'] + 1
                             break
                 
