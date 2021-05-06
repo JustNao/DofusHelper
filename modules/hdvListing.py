@@ -154,6 +154,7 @@ def packetRead(msg):
         time.sleep(1)
         pyperclip.copy(sellsList[0][1]['name'])
         ag.hotkey("ctrl", "v")
+        time.sleep(0.3)
         ag.click(sellInfoPos)
 
         
@@ -192,6 +193,7 @@ def automatePrices(threshold):
                     ag.typewrite(['del'])
                     pyperclip.copy(item['name'])
                     ag.hotkey("ctrl", "v")
+                    time.sleep(0.4)
                     for i in range(item['playerAmount'].count[unit]['quantity']):
                         ag.click(selectPos[0], selectPos[1] + positionShift)
                         positionShift += 43
