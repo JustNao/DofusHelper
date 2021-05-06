@@ -102,7 +102,15 @@ def getCurrentSells(packet):
             sells[object['objectGID']] = {
                                             'name' : itemToName[object['objectGID']],
                                             'playerAmount' : Item(quantity = ind, price = object['objectPrice'])
-                                        }
+            }
+    newSells = sells.copy()
+    # Checking if item names are similar, in which case some problems may occur down the line
+    for firstItem in sells:
+        for secondItem in sells:
+            if (secondItem in newSells) and (firstItem != secondItem) and ((itemToName[firstItem] in itemToName[secondItem]) or (itemToName[secondItem] in itemToName[firstItem])):
+                newSells.pop(secondItem)
+    
+    sells = newSells
     for key in sells:
         print(str(key) + ' : ' + str(sells[key]))
 
@@ -148,6 +156,8 @@ def packetRead(msg):
         ag.hotkey("ctrl", "v")
         ag.click(sellInfoPos)
 
+        
+
     elif msg.id == 4848:
         # ExchangeBidPriceForSellerMessage
         packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
@@ -162,15 +172,27 @@ def automatePrices(threshold):
     except AttributeError:
         pass
     for key in sellsList:
+
+        # Checking if item names are similar, in which case some problems may occur down the line
+        tooRisky = False
+        for iteratedKey in sellsList:
+            if (key != iteratedKey) and ((itemToName[key] in itemToName[iteratedKey]) or (itemToName[iteratedKey] in itemToName[key])):
+                tooRisky = True
+                break
+        if tooRisky:
+            continue   
+
         item = key[1]
+        itemNumber = 0
         if item['dif'] > threshold :
+            unitCount = 0
             time.sleep(random()/2)
             positionShift = 0
-            itemNumber = 0
             for unit in range(2,-1,-1):
                 if (item['playerAmount'].count[unit]['quantity'] == 0) or (item['playerAmount'].count[unit]['postedPrice'] - item['hdvAmount'][unit] == 0):
                     for i in range(item['playerAmount'].count[unit]['quantity']):
                         positionShift += 43
+                        itemNumber += 1
                     continue
                 else:
                     ag.click(posSearch)
@@ -184,7 +206,8 @@ def automatePrices(threshold):
                         ag.click(selectPos[0], selectPos[1] + positionShift)
                         positionShift += 43
                         itemNumber += 1
-                        if (itemNumber == 15):
+                        unitCount += 1
+                        if (itemNumber >= 15):
                             break
                     newPrice = item['hdvAmount'][unit] - 1
                     print('Changing', Fore.YELLOW + str(item['playerAmount'].count[unit]['quantity']*pow(10, unit)) + Fore.RESET, 'units of', Fore.YELLOW + item['name'] + Fore.RESET, 'to', Fore.YELLOW + str('{:n}'.format(newPrice)) + 'K' + Fore.RESET)
@@ -209,6 +232,7 @@ def automatePrices(threshold):
                     else:
                         print("If there is a confirmation popup, i can't detect it. Otherwise, nothing is wrong, a single item just doesn't require confirmation")
                         time.sleep(3)
+                time.sleep(unitCount*0.5)
         index += 1
         ui.updateProgressBar((index/len(sells)*100))
     print(Fore.GREEN + 'Item pricing done !' + Fore.RESET)
