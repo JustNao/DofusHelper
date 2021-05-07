@@ -15,6 +15,7 @@ class GraphicalInterface():
         self.startSniff = startSniff
         self.stopSniff = None
         self.botting = True
+        self._abortWindow = False
         sg.LOOK_AND_FEEL_TABLE['TreasureHunt'] = {'BACKGROUND': '#d4c194',
                                                   'TEXT': 'black',
                                                   'INPUT': '#DDE0DE',
@@ -312,7 +313,9 @@ class GraphicalInterface():
     def startMissingItemsUi(self):
         global moduleWindow
         from modules.hdvMissingItems import MissingItemLookup
-        missingItems = MissingItemLookup()
+        missingItems = MissingItemLookup(self)
+        if self._abortWindow:
+            return
         self.initilisation(missingItems.packetRead, 0)
 
 
@@ -343,7 +346,7 @@ class GraphicalInterface():
                 break
 
         moduleWindow.close()
-
+        return
 
 
     def dataUpdate(self, data, colors = None):
@@ -393,7 +396,33 @@ class GraphicalInterface():
     def warningPopup(self):
         sg.Popup('WARNING', 'L\'item va être posté à un prix très éloigné du prix moyen estimé. Etes-vous sûr de vouloir le poster à ce prix ?')
 
+    def overWrite(self):
+        layout = [
+            [sg.Text("Today's items were already loaded. Do you want to overwrite them ?")],
+            [sg.Button("Yes", key = "yes"), sg.Button("No", key = "no")]
+        ] 
 
+        window = sg.Window(
+            'Overwrite warning', 
+            layout,
+            use_default_focus=False,
+            keep_on_top=True,
+            no_titlebar=True,
+            element_justification='center',
+            grab_anywhere=False,
+            )
+
+        event, values = window.read()
+        if event == "yes":
+            window.close()
+            return True
+        else:
+            window.close()
+            return False
+
+    def abortWindow(self):
+        self._abortWindow = True
+        
 def init(startSniff):
     global ui
     ui = GraphicalInterface(startSniff)

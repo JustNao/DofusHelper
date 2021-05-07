@@ -1,39 +1,68 @@
 print('Importing sources ...')
 
+from pyasn1.type.univ import Boolean
 from sniffer import protocol
 from openpyxl import load_workbook
 from itertools import islice
 import time, datetime
 from colorama import Fore
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 from sources.item import gameItems, itemToName
+import threading
 print('Sources imported !')
 
+# Print iterations progress
+def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
+    # Print New Line on Complete
+    if iteration == total: 
+        print()
 
 class MissingItemLookup:
-    def __init__(self) -> None:
-        self._filename = 'output/missingItems.xlsx'
-        self._wb = load_workbook(self._filename)
+    def __init__(self, gui) -> Boolean:
+        # use creds to create a client to interact with the Google Drive API
+        scope = ['https://www.googleapis.com/auth/drive']
+        creds = ServiceAccountCredentials.from_json_keyfile_name('access/client_secret.json', scope)
+        self._client = gspread.authorize(creds)
         self._alreadyMissingItems = {}
 
-        currentDateFormatted = str(datetime.datetime.today().strftime ('%d-%m-%Y')) # format the date to ddmmyyyy
-        self._isCurrentDay = (self._wb['Coiffe']['I1'].value == currentDateFormatted)
-        
-        for sheetName in self._wb.sheetnames:
-            self._wb[sheetName]['I1'].value = currentDateFormatted
-            sheet = self._wb[sheetName]
-            self._alreadyMissingItems[sheetName] = []
-            for row in islice(sheet.values, 1, sheet.max_row):
-                if row[0] == "Level":
-                    continue
-                else:  
-                    self._alreadyMissingItems[sheetName].append(
-                        {
-                            'level': row[0],
-                            'name': row[1],
-                            'stats': row[2],
-                            'days': row[3]
-                        }
-                    )
+        # Find a workbook by name and open the first sheet
+        # Make sure you use the right name here.
+        self._spreadSheet = self._client.open("Missing Items")
+
+        # Extract and print all of the values
+        infos = self._spreadSheet.worksheet("Infos").get_all_records()
+        lastSave = infos[0]['Last save']
+        self._workSheets = self._spreadSheet.worksheets()
+
+        self._currentDateFormatted = str(datetime.datetime.today().strftime ('%d-%m-%Y')) # format the date to ddmmyyyy
+        self._isCurrentDay = (lastSave == self._currentDateFormatted)
+        if self._isCurrentDay:
+            self.overWrite = gui.overWrite()
+            if self.overWrite:
+                # t = threading.Thread(target=self.moduleInitialization, name="Module Initialization")
+                # t.start()
+                self.moduleInitialization()
+            else:
+                gui.abortWindow()
+
+    def moduleInitialization(self):
         self._idToType = {
             1: 'Amulette',
             9: 'Anneau',
@@ -63,6 +92,18 @@ class MissingItemLookup:
                 self._missingItems[type]
             except KeyError:
                 self._missingItems[type] = []
+
+        countTypes = len(self._missingItems)
+        print(Fore.YELLOW + "Getting old items" + Fore.RESET)
+        printProgressBar(0, countTypes, prefix = 'Progress:', suffix = 'Received', length = 50)
+        ind = 1
+        for sheetIndex in range(countTypes):
+            sheet = self._workSheets[sheetIndex]
+            self._alreadyMissingItems[sheet.title] = sheet.get_all_records()
+            printProgressBar(ind, countTypes, prefix = 'Progress:', suffix = 'Received', length = 50)
+            ind += 1
+        self.abort = False
+        return False
     def packetRead(self, msg):
         if msg.id == 7549:
             packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
@@ -72,37 +113,39 @@ class MissingItemLookup:
                 if item['id'] not in packet['typeDescription'] and item['craftable']:
                     self._missingItems[self._idToType[packet['objectType']]].append(item)
             print("Catégorie " + Fore.CYAN + self._idToType[packet['objectType']] + Fore.RESET + " ajoutée")    
-    def saveMissingItems(self):
-        if not self._isCurrentDay:
-            print(Fore.LIGHTMAGENTA_EX + "Getting old items" + Fore.RESET)
-        for itemType, itemList in self._missingItems.items():
-            currentRow = 2
-            for item in itemList:
-                dayCount = 0
 
-                #  Checking if the item was already missing, only if it's not the same day
-                for itemAlreadyMissing in self._alreadyMissingItems[itemType]:
-                    if itemAlreadyMissing['name'] == itemToName[item['id']]:
-                        if not self._isCurrentDay:
-                            dayCount = itemAlreadyMissing['days'] + 1
-                        else:
-                            dayCount = itemAlreadyMissing['days']
-                        break
-                
-                effects = ', '.join(item['effects'])
-                self._wb[itemType]['A' + str(currentRow)].value = item['level']
-                self._wb[itemType]['B' + str(currentRow)].value = itemToName[item['id']]      
-                self._wb[itemType]['C' + str(currentRow)].value = effects      
-                self._wb[itemType]['D' + str(currentRow)].value = dayCount
-                currentRow += 1
-            self._wb[itemType].delete_rows(currentRow, 200)
-        saved = False
-        while not saved:
-            try:
-                self._wb.save(self._filename)
-                saved = True
-                print(Fore.GREEN + "File saved" + Fore.RESET)
-            except PermissionError:
-                print(Fore.RED + "Can't save the file, please close it" + Fore.RESET)
-                time.sleep(2)
+    def saveMissingItems(self):
+        try:
+            typeProgress = 1
+            countTypes = len(self._missingItems)
+            print(Fore.YELLOW + "Sending new items" + Fore.RESET)
+            printProgressBar(0, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
+            for itemType, itemList in self._missingItems.items():
+                newRows = []
+                currentRow = 2
+                for item in itemList:
+                    dayCount = 0
+                    com = ""
+                    #  Checking if the item was already missing, only if it's not the same day
+                    for itemAlreadyMissing in self._alreadyMissingItems[itemType]:
+                        if itemAlreadyMissing['Nom'] == itemToName[item['id']]:
+                            if not self._isCurrentDay:
+                                dayCount = itemAlreadyMissing['Jours consécutifs'] + 1
+                            else:
+                                dayCount = itemAlreadyMissing['Jours consécutifs']
+                            com = itemAlreadyMissing['Commentaires']
+                            break
+                    
+                    effects = ', '.join(item['effects'])
+                    newRows.append(
+                        [item['level'], itemToName[item['id']], effects, dayCount, com]
+                    )
+                    currentRow += 1            
+                self._spreadSheet.worksheet(itemType).delete_rows(2, len(self._alreadyMissingItems[itemType]))
+                self._spreadSheet.worksheet(itemType).insert_rows(newRows, row = 2)
+                printProgressBar(typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
+                typeProgress += 1
+            self._spreadSheet.worksheet("Infos").update_cell(1, 2, self._currentDateFormatted)
+        except:
+            print(Fore.RED + "Error with Google" + Fore.RESET)
 

@@ -40,6 +40,9 @@ Cliquer sur le bouton 'Automate Prices' va actualiser tous les items dont la dif
 Lancer le module, aller à l'HDV équipements, et sélectionner toutes les catégories craftables (coiffe, cape, arme, bouclier, etc). Une fois chacune chargée (un message dans la console s'affiche pour chaque sous catégorie), vous pouvez sauvegarder les données, qui seront stockées dans output/missingItems.xlsx.
 L'outil écrase les valeurs précédentes à chaque fois, les catégories manquantes dans le chargement seront donc vides.
 
+La version actuelle utilise un GoogleSheets personnel, elle ne marchera donc pas pour vous. 
+J'ai laissé hdvMissingItems.local.py pour accéder à la version locale (supprimez la nouvelle version et enlevez le .local du fichier).
+
 ### Chat Searcher
 
 Scan tous les messages du chat à la recherche de la chaîne de caractère donnée en input. Renvoie le message avec le nom du personnage dans la console. Plusieurs éléments de recherche sont possibles, en les séparant avec un ';'.

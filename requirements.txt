@@ -8,3 +8,5 @@ pillow
 pywin32
 pywinauto
 openpyxl
+gspread
+oauth2client
