@@ -145,7 +145,7 @@ class MissingItemLookup:
                 self._spreadSheet.worksheet(itemType).insert_rows(newRows, row = 2)
                 printProgressBar(typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
                 typeProgress += 1
-            self._spreadSheet.worksheet("Infos").update_cell(1, 2, self._currentDateFormatted)
+            self._spreadSheet.worksheet("Infos").update_cell(2, 1, self._currentDateFormatted)
         except:
             print(Fore.RED + "Error with Google" + Fore.RESET)
 
