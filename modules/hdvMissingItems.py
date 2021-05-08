@@ -116,37 +116,64 @@ class MissingItemLookup:
             print("Catégorie " + Fore.CYAN + self._idToType[packet['objectType']] + Fore.RESET + " ajoutée")    
 
     def saveMissingItems(self):
+        # Failsafe
+        if len(self._missingItems['Coiffe']) == 0:
+            return
+
+        typeProgress = 0
+        countTypes = len(self._missingItems)
+        print(Fore.YELLOW + "Sending new items" + Fore.RESET)
+        printProgressBar(0, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
         try:
-            typeProgress = 1
-            countTypes = len(self._missingItems)
-            print(Fore.YELLOW + "Sending new items" + Fore.RESET)
-            printProgressBar(0, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
             for itemType, itemList in self._missingItems.items():
                 newRows = []
-                currentRow = 2
+                oldRows = []
+                deleteRows = []
+
+                # Selecting old items that will be deleted (not missing anymore)
+                rowToDelete = 1
+                for oldItem in self._alreadyMissingItems[itemType]:
+                    found = False
+                    for newItem in itemList:
+                        if oldItem['Nom'] == itemToName[newItem['id']]:
+                            found = True
+                            break
+                    if not found:
+                        deleteRows.append(rowToDelete + 1) # + 1 to take into account the header
+                    rowToDelete += 1
+
                 for item in itemList:
                     dayCount = 0
-                    com = ""
-                    #  Checking if the item was already missing, only if it's not the same day
+                    
+                    # Check if the item is already missing
+                    alreayMissing = False
                     for itemAlreadyMissing in self._alreadyMissingItems[itemType]:
                         if itemAlreadyMissing['Nom'] == itemToName[item['id']]:
                             if not self._isCurrentDay:
                                 dayCount = itemAlreadyMissing['Jours consécutifs'] + 1
                             else:
                                 dayCount = itemAlreadyMissing['Jours consécutifs']
-                            com = itemAlreadyMissing['Commentaires']
+                            oldRows.append([dayCount])
+                            alreadyMissing = True
                             break
-                    
-                    effects = ', '.join(item['effects'])
-                    newRows.append(
-                        [item['level'], itemToName[item['id']], effects, dayCount, com]
-                    )
-                    currentRow += 1            
-                self._spreadSheet.worksheet(itemType).delete_rows(2, len(self._alreadyMissingItems[itemType]))
+                    if not alreadyMissing:
+                        effects = ', '.join(item['effects'])
+                        newRows.append(
+                            [item['level'], itemToName[item['id']], effects, dayCount, ""]
+                        )
+                progress = 1
+                for rowToDelete in deleteRows:
+                    self._spreadSheet.worksheet(itemType).delete_row(rowToDelete)
+                    printProgressBar((progress/(len(deleteRows) + 3)) + typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
+                    progress += 1
+                # self._spreadSheet.worksheet(itemType).delete_rows(2, len(self._alreadyMissingItems[itemType]))
+                self._spreadSheet.worksheet(itemType).update("D2:D" + str(len(oldRows) + 1), oldRows)
+                printProgressBar((progress/(len(deleteRows) + 3)) + typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
+                progress += 1
                 self._spreadSheet.worksheet(itemType).insert_rows(newRows, row = 2)
-                printProgressBar(typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
+                printProgressBar((progress/(len(deleteRows) + 3)) + typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
                 typeProgress += 1
             self._spreadSheet.worksheet("Infos").update_cell(2, 1, self._currentDateFormatted)
-        except:
+            printProgressBar(countTypes, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
+        except gspread.exceptions.APIError:
             print(Fore.RED + "Error with Google" + Fore.RESET)
-
