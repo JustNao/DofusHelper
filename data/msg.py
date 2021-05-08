@@ -53,16 +53,16 @@ class Msg:
             lenData = int.from_bytes(buf.read(header & 3), "big")
             id = header >> 2
             data = Data(buf.read(lenData))
-            protocol.msg_from_id[id]
-            # print("Packet received: ", protocol.msg_from_id[id])
-
+            try:
+                protocol.msg_from_id[id]
+            except KeyError:
+                # print(Fore.RED + "Flushing buffer" + Fore.RESET)
+                buf.pos = len(buf)
+                buf.end()
+                return None
         except IndexError:
             buf.pos = 0
             logger.debug('Multi packet message')
-            return None
-        except KeyError:
-            buf.pos = len(buf)
-            # print(Fore.LIGHTMAGENTA_EX + 'Key Error, flushing buffer (may need to manually do the action)' + Fore.RESET)
             return None
         else:
             if id == 2:
@@ -72,7 +72,7 @@ class Msg:
                 msg = Msg.fromRaw(newbuffer, from_client)
                 assert msg is not None and not newbuffer.remaining()
                 return msg
-            logger.debug("Parsed %s", protocol.msg_from_id[id]["name"])
+            # logger.debug("Parsed %s", protocol.msg_from_id[id]["name"])
             buf.end()
 
             return Msg(id, data, count)

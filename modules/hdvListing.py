@@ -176,10 +176,10 @@ def automatePrices(threshold):
         item = key[1]
         itemNumber = 0
         if item['dif'] > threshold :
-            unitCount = 0
             time.sleep(random()/2)
             positionShift = 0
             for unit in range(2,-1,-1):
+                unitCount = 0
                 if (item['playerAmount'].count[unit]['quantity'] == 0) or (item['playerAmount'].count[unit]['postedPrice'] - item['hdvAmount'][unit] == 0):
                     for i in range(item['playerAmount'].count[unit]['quantity']):
                         positionShift += 43
