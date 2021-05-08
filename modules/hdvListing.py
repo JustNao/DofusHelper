@@ -221,7 +221,7 @@ def automatePrices(threshold):
                         ouiPos = ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\oui.png', confidence = 0.75)
                     if ouiPos is not None:
                         ag.click(ouiPos)
-                    elif not (unitCount > 1):
+                    elif (unitCount > 1):
                         print("If there is a confirmation popup, i can't detect it. Otherwise, nothing is wrong, a single item just doesn't require confirmation")
                         time.sleep(3)
                 time.sleep(unitCount*0.5)
