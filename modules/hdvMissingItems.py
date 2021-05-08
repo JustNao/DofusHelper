@@ -3,7 +3,6 @@ print('Importing sources ...')
 from pyasn1.type.univ import Boolean
 from sniffer import protocol
 from openpyxl import load_workbook
-from itertools import islice
 import time, datetime
 from colorama import Fore
 import gspread
@@ -61,6 +60,8 @@ class MissingItemLookup:
                 self.moduleInitialization()
             else:
                 gui.abortWindow()
+        else:
+            self.moduleInitialization()
 
     def moduleInitialization(self):
         self._idToType = {
