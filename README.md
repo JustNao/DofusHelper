@@ -49,7 +49,10 @@ Scan tous les messages du chat à la recherche de la chaîne de caractère donn�
 
 ### Multicompte Tool
 
-A chaque début de tour dans un combat, ouvre la fenêtre du joueur correspondant. Rentrer dans DHM la liste de tous les personnages jouables. Si la case 'Mule' est cochée, la touche 'V' sera appuyée au changement de fenêtre (raccourci pour passer le tour dans mon cas).
+A chaque début de tour dans un combat, ouvre la fenêtre du joueur correspondant. Rentrer dans DHM la liste de tous les personnages jouables. Si la case 'Mule' est cochée, la touche 'V' sera appuyée au changement de fenêtre (raccourci pour passer le tour dans mon cas). Le bouton 'Save' sauvegarde la liste des personnages actuels dans config/multicompte.json.
+Pour lancer le module avec les personnages sauvegardés, n'en ajoutez aucun manuellement et lancez le directement.
+
+Le module recupère l'ID de chaque personnage en entrant en combat, et l'associe à un nom de personnage grâce à la fenêtre active. Si vous voulez que le module marche bien, il faut donc que le client du personnage qui entre en combat soit ouvert au moment où celui-ci entre en combat (pas de alt-tab dès que vous cliquez sur un groupe par exemple).
 
 ### AvA Counter
 

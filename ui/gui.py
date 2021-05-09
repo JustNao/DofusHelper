@@ -285,7 +285,7 @@ class GraphicalInterface():
             return [[sg.In('', k = 'I' + f'{ind}', size =(15, 0)), sg.Checkbox('Mule', k = 'CB' + f'{ind}')]] 
 
         layout = [[sg.Column(rowElement(i), visible = False, k = 'ROW' + f'{i}')] for i in range(8)]
-        layout += [[sg.Button('Add character', key = '-ADD-')]]
+        layout += [[sg.Button('Add character', key = '-ADD-'), sg.Button('Save config', key = '-SAVE-')]]
         layout += [[sg.Button(image_filename=imgList['off'], button_color=('#2c2e25',
             '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]]
         moduleWindow = sg.Window('Multicompte Tool', layout, element_justification = 'center')
@@ -309,6 +309,19 @@ class GraphicalInterface():
                     loaded = True
                 else:
                     self.load()
+            elif event == '-SAVE-':
+                characters = []
+                for i in range(8):
+                    if values['I' + str(i)] != '':
+                        characters.append({
+                            "name": values['I' + str(i)],
+                            "mule": values['CB' + str(i)]
+                        })
+                    else:
+                        break
+                from json import dump
+                with open('config/multicompte.json', 'w') as outFile:
+                    dump(characters, outFile)
 
     def startMissingItemsUi(self):
         global moduleWindow
