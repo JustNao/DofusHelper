@@ -95,7 +95,7 @@ class MissingItemLookup:
             try:
                 self._missingItems[type]
             except KeyError:
-                self._missingItems[type] = []
+                self._missingItems[type] = {}
 
         countTypes = len(self._missingItems)
         print(Fore.YELLOW + "Getting old items" + Fore.RESET)
@@ -115,14 +115,15 @@ class MissingItemLookup:
                 return
             for item in gameItems[str(packet['objectType'])]:
                 if item['id'] not in packet['typeDescription'] and item['craftable']:
-                    self._missingItems[self._idToType[packet['objectType']]].append(item)
+                    self._missingItems[self._idToType[packet['objectType']]][item['id']] = item
             print("Catégorie " + Fore.CYAN + self._idToType[packet['objectType']] + Fore.RESET + " ajoutée")    
 
     def saveMissingItems(self):
         global requestCount
         # Failsafe
-        if len(self._missingItems['Coiffe']) == 0:
-            return
+        for itemType in self._missingItems.keys():
+            if len(self._missingItems[itemType]) == 0:
+                return
 
         typeProgress = 0
         requestCount = 0
@@ -138,7 +139,7 @@ class MissingItemLookup:
             rowToDelete = 1
             for oldItem in self._alreadyMissingItems[itemType]:
                 found = False
-                for newItem in itemList:
+                for newItem in itemList.values():
                     if oldItem['Nom'] == itemToName[newItem['id']]:
                         found = True
                         break
@@ -146,11 +147,11 @@ class MissingItemLookup:
                     deleteRows.append(rowToDelete + 1) # + 1 to take into account the header
                 rowToDelete += 1
 
-            for item in itemList:
+            for item in itemList.values():
                 dayCount = 0
                 
                 # Check if the item is already missing
-                alreayMissing = False
+                alreadyMissing = False
                 for itemAlreadyMissing in self._alreadyMissingItems[itemType]:
                     if itemAlreadyMissing['Nom'] == itemToName[item['id']]:
                         if not self._isCurrentDay:
@@ -177,9 +178,9 @@ class MissingItemLookup:
             self._spreadSheet.worksheet(itemType).insert_rows(newRows, row = 2)
             printProgressBar((progress/(len(deleteRows) + 3)) + typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
             typeProgress += 1
-            if requestCount > 15:
-                time.sleep(60)
-                requestCount = 0
+            if requestCount > 25:
                 printProgressBar((progress/(len(deleteRows) + 3)) + typeProgress, countTypes, prefix = 'Pause for request limit:', suffix = 'Sent', length = 50)
+                requestCount = 0
+                time.sleep(60)
         self._spreadSheet.worksheet("Infos").update_cell(2, 1, self._currentDateFormatted)
         printProgressBar(countTypes, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
