@@ -2,13 +2,11 @@ print('Importing sources ...')
 
 from pyasn1.type.univ import Boolean
 from sniffer import protocol
-from openpyxl import load_workbook
 import time, datetime
 from colorama import Fore
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from sources.item import gameItems, itemToName
-import threading
 print('Sources imported !')
 
 # Print iterations progress
@@ -108,6 +106,16 @@ class MissingItemLookup:
             ind += 1
         self.abort = False
         return False
+    
+    def _indexOf(self, nameToLookFor, dictList):
+        index = 0
+        for item in dictList:
+            if item['Nom'] == nameToLookFor:
+                return index
+            else:
+                index += 1
+        return -1
+
     def packetRead(self, msg):
         if msg.id == 7549:
             packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
@@ -132,9 +140,9 @@ class MissingItemLookup:
         printProgressBar(0, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
         for itemType, itemList in self._missingItems.items():
             newRows = []
-            oldRows = []
+            oldRows = {}
+            updateRows = []
             deleteRows = []
-
             # Selecting old items that will be deleted (not missing anymore)
             rowToDelete = 1
             for oldItem in self._alreadyMissingItems[itemType]:
@@ -158,7 +166,8 @@ class MissingItemLookup:
                             dayCount = itemAlreadyMissing['Jours consécutifs'] + 1
                         else:
                             dayCount = itemAlreadyMissing['Jours consécutifs']
-                        oldRows.append([dayCount])
+                        effects = ', '.join(item['effects'])
+                        oldRows[self._indexOf(itemToName[item['id']], self._alreadyMissingItems[itemType])] = [effects, dayCount]
                         alreadyMissing = True
                         break
                 if not alreadyMissing:
@@ -166,19 +175,27 @@ class MissingItemLookup:
                     newRows.append(
                         [item['level'], itemToName[item['id']], effects, dayCount, ""]
                     )
+
             progress = 1
+
+            for i in range(len(oldRows)):
+                for itemIndex, itemToUpdate in oldRows.items():
+                    if i == itemIndex:
+                        updateRows.append(itemToUpdate)
+                        break
+            
             for rowToDelete in deleteRows:
                 self._spreadSheet.worksheet(itemType).delete_row(rowToDelete)
                 printProgressBar((progress/(len(deleteRows) + 3)) + typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
                 progress += 1
             # self._spreadSheet.worksheet(itemType).delete_rows(2, len(self._alreadyMissingItems[itemType]))
-            self._spreadSheet.worksheet(itemType).update("D2:D" + str(len(oldRows) + 1), oldRows)
+            self._spreadSheet.worksheet(itemType).update("C2:D" + str(len(updateRows) + 1), updateRows)
             printProgressBar((progress/(len(deleteRows) + 3)) + typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
             progress += 1
             self._spreadSheet.worksheet(itemType).insert_rows(newRows, row = 2)
             printProgressBar((progress/(len(deleteRows) + 3)) + typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
             typeProgress += 1
-            if requestCount > 25:
+            if requestCount > 35:
                 printProgressBar((progress/(len(deleteRows) + 3)) + typeProgress, countTypes, prefix = 'Pause for request limit:', suffix = 'Sent', length = 50)
                 requestCount = 0
                 time.sleep(60)
