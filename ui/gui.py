@@ -211,7 +211,14 @@ class GraphicalInterface():
             [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25','#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
         ]
         sg.theme('HDV')
-        moduleWindow = sg.Window('Données ventes', layout, resizable = True, element_justification = 'center', grab_anywhere = True)
+        moduleWindow = sg.Window(
+            'Données ventes', 
+            layout, 
+            resizable = True, 
+            element_justification = 'center', 
+            grab_anywhere = True,
+            keep_on_top=True,
+            )
 
         loaded = False
         while True:
