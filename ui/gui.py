@@ -203,46 +203,28 @@ class GraphicalInterface():
 
     def startHdvUi(self):
         global moduleWindow
-        from modules.hdvListing import automatePrices, packetRead
+        from modules.hdvListing import packetRead
 
-        self.initilisation(packetRead, 0.3)
-
-        headings = ['            ITEM            ', '(1) PRIX JOUEUR', '(1) PRIX HDV', '(10) PRIX JOUEUR', '(10) PRIX HDV', '(100) PRIX JOUEUR', '(100) PRIX HDV', 'DIFFERENCE']
+        # self.initilisation(packetRead, 0.3)
 
         layout = [
-            [sg.Button(image_filename=imgList['on'], button_color=('#2c2e25',
-            '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0)),
-            sg.Input('0', disabled = True, visible = False, key = '-PERCENT-', background_color = '#6e6f6e', size = (10, 10), text_color = '#eec606'),
-            sg.Button('Automate Prices', visible = False, border_width = 0, key = '-AUTOMATE-'),
-            sg.ProgressBar(100, key = '-BAR-', orientation = 'h', size = (20, 20), bar_color = ('#bfe700', '#6e6f6e'))],
-            [sg.Table(values = [['' for _ in range(len(headings))]],
-            headings = headings, 
-            hide_vertical_scroll = True,
-            justification = 'center',
-            font = 'Lato',
-            background_color = '#393a32',
-            text_color = 'black',
-            num_rows = 20,
-            header_background_color = '#696968',
-            header_text_color = '#eec606',
-            key = '-TABLE-')]
+            [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25','#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
         ]
         sg.theme('HDV')
-        moduleWindow = sg.Window('Données ventes', layout, resizable = True, element_justification = 'center')
+        moduleWindow = sg.Window('Données ventes', layout, resizable = True, element_justification = 'center', grab_anywhere = True)
 
+        loaded = False
         while True:
             event, values = moduleWindow.read()
             if event == sg.WIN_CLOSED:
                 self.stop(toggle = True)
                 break
             elif event == "ON/OFF":
-                self.load()
-            elif event == "-AUTOMATE-":
-                moduleWindow['-BAR-'].update(current_count = 0, visible = True)
-                moduleWindow['-PERCENT-'].update(visible  = False, disabled = True)
-                moduleWindow['-AUTOMATE-'].update(visible = False)
-                t = threading.Thread(target=automatePrices, args = (int(float(values['-PERCENT-'])), ), name="Pricing")
-                t.start()
+                if not loaded:
+                    self.initilisation(packetRead, 0.3)
+                    loaded = True
+                else:
+                    self.load()
         moduleWindow.close()
         
     def startSearcherUi(self):

@@ -52,7 +52,6 @@ class Msg:
                 count = None
             lenData = int.from_bytes(buf.read(header & 3), "big")
             id = header >> 2
-            data = Data(buf.read(lenData))
             try:
                 protocol.msg_from_id[id]
             except KeyError:
@@ -60,8 +59,9 @@ class Msg:
                 buf.pos = len(buf)
                 buf.end()
                 return None
+            data = Data(buf.read(lenData))
         except IndexError:
-            buf.pos = 0
+            buf.pos = len(buf) # should be buf.pos = 0, but i'm flushing the buffer so it won't crash everytime a multi-packet message comes
             logger.debug('Multi packet message')
             return None
         else:

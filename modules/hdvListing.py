@@ -115,34 +115,16 @@ def getCurrentSells(packet):
         print(str(key) + ' : ' + str(sells[key]))
 
 def getCurrentPrice(packet):
-    global index, sells
-    sells[packet['genericId']]['hdvAmount'] = packet['minimalPrices']
-    ui.updateProgressBar((index/len(sells)*100))
-    try:
-        ag.click(posSearch)
-        ag.hotkey("ctrl", "a")
-        ag.typewrite(['del'])
-        pyperclip.copy(sellsList[index][1]['name'])
-        ag.hotkey("ctrl", "v")
-        time.sleep(random()/4)
-        ag.click(sellInfoPos)
-        index += 1
-    except IndexError:
-        print(Fore.GREEN + "Finished listing all prices" + Fore.RESET)
-        data = dataSells(sells)
-        colors = getColors(data)
-        ui.dataUpdate(data, colors)
+    if not 'hdvAmount' in sells[packet['genericId']]:
+        sells[packet['genericId']]['hdvAmount'] = packet['minimalPrices']
+        setNewPrice()
 
 def packetRead(msg):
-    global sellsList, index, posSearch, sellInfoPos, middleElementPos
+    global sellsList, index, posSearch, sellInfoPos, middleElementPos, selectPos
     if msg.id == 8157:
         # ExchangeStartedSellerMessage
         packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
-        getCurrentSells(packet)
-        index = 1
-        sellsList = list(sells.items())
-        time.sleep(1.5)
-        print(Fore.YELLOW + "Starting to look for prices ..." + Fore.RESET)
+        time.sleep(1)
         middleElementPos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\hdvMiddleElement.png', confidence = 0.75)
         try:
             posSearch = (middleElementPos[0], middleElementPos[1] - 40)
@@ -150,81 +132,102 @@ def packetRead(msg):
         except TypeError:
             print(Fore.RED + 'Couldn\'t find the position to click. Is Dofus open ?' + Fore.RESET)
             return
-        ag.click(posSearch)
+        ag.PAUSE = 0.3
+        selectPos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\hdvSellItemClick.png', region = (sellInfoPos[0], sellInfoPos[1] - 20, 250, 40), grayscale = True, confidence = 0.75)
+        try:
+            ag.click(ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\lot.png'), clicks = 2, interval = 0.05)
+        except AttributeError:
+            pass
+        getCurrentSells(packet)
+        sellsList = list(sells.items())
         time.sleep(1)
+        print(Fore.YELLOW + "Starting item price update" + Fore.RESET)
+        index = 0
+        time.sleep(random()/2)
+        ag.click(posSearch)
+        time.sleep(0.5)
+        ag.hotkey("ctrl", "a")
+        ag.hotkey("ctrl", "a")
+        ag.typewrite(['del'])
         pyperclip.copy(sellsList[0][1]['name'])
         ag.hotkey("ctrl", "v")
-        time.sleep(0.3)
+        time.sleep(1)
         ag.click(sellInfoPos)
-
-        
 
     elif msg.id == 4848:
         # ExchangeBidPriceForSellerMessage
         packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
         getCurrentPrice(packet)
 
-def automatePrices(threshold):
-    index = 0
-    ag.PAUSE = 0.3
-    selectPos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\hdvSellItemClick.png', region = (sellInfoPos[0], sellInfoPos[1] - 20, 250, 40), grayscale = True, confidence = 0.75)
-    try:
-        ag.click(ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\lot.png'), clicks = 2, interval = 0.05)
-    except AttributeError:
-        pass
-    for key in sellsList:
-        item = key[1]
-        itemNumber = 0
-        if item['dif'] > threshold :
-            time.sleep(random()/2)
-            positionShift = 0
-            for unit in range(2,-1,-1):
-                unitCount = 0
-                if (item['playerAmount'].count[unit]['quantity'] == 0) or (item['playerAmount'].count[unit]['postedPrice'] - item['hdvAmount'][unit] == 0):
-                    for i in range(item['playerAmount'].count[unit]['quantity']):
-                        positionShift += 43
-                        itemNumber += 1
-                    continue
-                else:
-                    ag.click(posSearch)
-                    time.sleep(0.5)
-                    ag.hotkey("ctrl", "a")
-                    ag.hotkey("ctrl", "a")
-                    ag.typewrite(['del'])
-                    pyperclip.copy(item['name'])
-                    ag.hotkey("ctrl", "v")
-                    time.sleep(0.4)
-                    for i in range(item['playerAmount'].count[unit]['quantity']):
-                        ag.click(selectPos[0], selectPos[1] + positionShift)
-                        positionShift += 43
-                        itemNumber += 1
-                        unitCount += 1
-                        if (itemNumber >= 15):
-                            break
-                    newPrice = item['hdvAmount'][unit] - 1
-                    print('Changing', Fore.YELLOW + str(item['playerAmount'].count[unit]['quantity']*pow(10, unit)) + Fore.RESET, 'units of', Fore.YELLOW + item['name'] + Fore.RESET, 'to', Fore.YELLOW + str('{:n}'.format(newPrice)) + 'K' + Fore.RESET)
-                    ag.typewrite(str(newPrice), interval = 0.05)
-                    ag.typewrite(['return'])
-                    
-                    if (ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\warning.png') is not None):
-                        ui.warningPopup()
-                        print(Fore.RED + 'WARNING : price is very far from the estimated one. Do you confirm using the new price ?' + Fore.RESET)
+def setNewPrice():
+    global index
+    item = sellsList[index][1]
+    if not "hdvAmount" in item:
+        return
+    itemCount = 0
+    positionShift = 0
+    firstItem = True
+    for unit in range(2,-1,-1):
+        unitCount = 0
+        if (item['playerAmount'].count[unit]['quantity'] == 0) or (item['playerAmount'].count[unit]['postedPrice'] - item['hdvAmount'][unit] == 0):
+            for i in range(item['playerAmount'].count[unit]['quantity']):
+                positionShift += 43
+                itemCount += 1
+            continue
+        else:
+            if not firstItem:
+                ag.click(posSearch)
+                time.sleep(0.5)
+                ag.hotkey("ctrl", "a")
+                ag.hotkey("ctrl", "a")
+                ag.typewrite(['del'])
+                pyperclip.copy(item['name'])
+                ag.hotkey("ctrl", "v")
+                time.sleep(1)
+            firstItem = False
+            for i in range(item['playerAmount'].count[unit]['quantity']):
+                ag.click(selectPos[0], selectPos[1] + positionShift)
+                positionShift += 43
+                itemCount += 1
+                unitCount += 1
+                if (itemCount >= 15):
+                    break
+            newPrice = item['hdvAmount'][unit] - 1
+            print('Changing', Fore.YELLOW + str(item['playerAmount'].count[unit]['quantity']*pow(10, unit)) + Fore.RESET, 'units of', Fore.YELLOW + item['name'] + Fore.RESET, 'to', Fore.YELLOW + str('{:n}'.format(newPrice)) + 'K' + Fore.RESET)
+            ag.typewrite(str(newPrice), interval = 0.05)
+            ag.typewrite(['return'])
+            
+            if (ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\warning.png') is not None):
+                ui.warningPopup()
+                print(Fore.RED + 'WARNING : price is very far from the estimated one. Do you confirm using the new price ?' + Fore.RESET)
 
-                    while (ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\warning.png') is not None):
-                        time.sleep(0.5)
+            while (ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\warning.png') is not None):
+                time.sleep(0.5)
 
-                    searchIndex = 0
-                    ouiPos = None
-                    while (ouiPos is None) and (searchIndex < 5):
-                        searchIndex += 1
-                        time.sleep(0.1)
-                        ouiPos = ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\oui.png', confidence = 0.75)
-                    if ouiPos is not None:
-                        ag.click(ouiPos)
-                    elif (unitCount > 1):
-                        print("If there is a confirmation popup, i can't detect it. Otherwise, nothing is wrong, a single item just doesn't require confirmation")
-                        time.sleep(3)
-                time.sleep(unitCount*0.5)
-        index += 1
-        ui.updateProgressBar((index/len(sells)*100))
-    print(Fore.GREEN + 'Item pricing done !' + Fore.RESET)
+            searchIndex = 0
+            ouiPos = None
+            while (ouiPos is None) and (searchIndex < 5):
+                searchIndex += 1
+                time.sleep(0.1)
+                ouiPos = ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\oui.png', confidence = 0.75)
+            if ouiPos is not None:
+                ag.click(ouiPos)
+            elif (unitCount > 1):
+                print("If there is a confirmation popup, i can't detect it. Otherwise, nothing is wrong, a single item just doesn't require confirmation")
+                time.sleep(3)
+        time.sleep(unitCount*0.5 + random()/2)
+
+
+    index += 1
+    if index >= len(sellsList):
+        # If it's the last item, don't need to load the next
+        return
+    ag.click(posSearch)
+    time.sleep(0.5)
+    ag.hotkey("ctrl", "a")
+    ag.hotkey("ctrl", "a")
+    ag.typewrite(['del'])
+    pyperclip.copy(sellsList[index][1]['name'])
+    ag.hotkey("ctrl", "v")
+    time.sleep(0.5)
+    ag.click(sellInfoPos)

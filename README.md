@@ -31,9 +31,7 @@ Mêmes fonctionnalités et fenêtre que le helper, mais tout est automatisé (sa
 
 ### HDV List
 
-Liste les objets en vente dans un HDV, avec la différence entre les prix postés par le joueur et le prix actuel. Trie les objets par différence en %.
-
-Cliquer sur le bouton 'Automate Prices' va actualiser tous les items dont la différence est strictement supérieur à la valeur spécifiée dans la cellule d'input. Chaque item sera alors posté à 1 Kamas moins cher.
+Une fois le sniffer activé, aller dans l'onglet vente d'un hdv va lister tous les items en vente, et les parcourir un par un. Les items qui ne sont pas les moins chers en hdv seront repostés au prix maximal - 1 kamas.
 
 ### HDV Missing Items
 
