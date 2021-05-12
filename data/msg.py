@@ -71,7 +71,10 @@ class Msg:
         else:
             if id == 2:
                 logger.debug("Message is NetworkDataContainerMessage! Uncompressing...")
-                newbuffer = Buffer(data.readByteArray())
+                try:
+                    newbuffer = Buffer(data.readByteArray())
+                except IndexError:
+                    return None
                 newbuffer.uncompress()
                 msg = Msg.fromRaw(newbuffer, from_client)
                 assert msg is not None and not newbuffer.remaining()
