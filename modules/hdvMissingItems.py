@@ -116,6 +116,13 @@ class MissingItemLookup:
                 index += 1
         return -1
 
+    def _idsFromType(self, inputType):
+        ids = []
+        for intType, strType in self._idToType.items():
+            if strType == inputType:
+                ids.append(intType)
+        return ids
+        
     def packetRead(self, msg):
         if msg.id == 7549:
             packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
@@ -145,35 +152,29 @@ class MissingItemLookup:
             deleteRows = []
             # Selecting old items that will be deleted (not missing anymore)
             rowToDelete = 1
-            for oldItem in self._alreadyMissingItems[itemType]:
-                found = False
-                for newItem in itemList.values():
-                    if oldItem['Nom'] == itemToName[newItem['id']]:
-                        found = True
-                        break
-                if not found:
-                    deleteRows.append(rowToDelete + 1) # + 1 to take into account the header
-                rowToDelete += 1
+            for itemAlreadyMissing in self._alreadyMissingItems[itemType]:
+                for id in self._idsFromType(itemType):
+                    for dbItem in gameItems[str(id)]:
+                        if itemToName[dbItem['id']] == itemAlreadyMissing['Nom']:
+                            if not self._isCurrentDay:
+                                dayCount = itemAlreadyMissing['Jours consécutifs'] + 1
+                            else:
+                                dayCount = itemAlreadyMissing['Jours consécutifs']
+                            # effects = ', '.join(dbItem['effects'])
+                            oldRows[self._indexOf(itemToName[dbItem['id']], self._alreadyMissingItems[itemType])] = [dayCount]
+                            break
 
             for item in itemList.values():
-                dayCount = 0
-                
                 # Check if the item is already missing
                 alreadyMissing = False
                 for itemAlreadyMissing in self._alreadyMissingItems[itemType]:
                     if itemAlreadyMissing['Nom'] == itemToName[item['id']]:
-                        if not self._isCurrentDay:
-                            dayCount = itemAlreadyMissing['Jours consécutifs'] + 1
-                        else:
-                            dayCount = itemAlreadyMissing['Jours consécutifs']
-                        effects = ', '.join(item['effects'])
-                        oldRows[self._indexOf(itemToName[item['id']], self._alreadyMissingItems[itemType])] = [effects, dayCount]
                         alreadyMissing = True
                         break
                 if not alreadyMissing:
                     effects = ', '.join(item['effects'])
                     newRows.append(
-                        [item['level'], itemToName[item['id']], effects, dayCount, ""]
+                        [item['level'], itemToName[item['id']], effects, 0, ""]
                     )
 
             progress = 1
@@ -184,20 +185,16 @@ class MissingItemLookup:
                         updateRows.append(itemToUpdate)
                         break
             
-            for rowToDelete in deleteRows:
-                self._spreadSheet.worksheet(itemType).delete_row(rowToDelete)
-                printProgressBar((progress/(len(deleteRows) + 3)) + typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
-                progress += 1
+            # for rowToDelete in deleteRows:
+            #     self._spreadSheet.worksheet(itemType).delete_row(rowToDelete)
+            #     printProgressBar((progress/(len(deleteRows) + 3)) + typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
+            #     progress += 1
             # self._spreadSheet.worksheet(itemType).delete_rows(2, len(self._alreadyMissingItems[itemType]))
-            self._spreadSheet.worksheet(itemType).update("C2:D" + str(len(updateRows) + 1), updateRows)
-            printProgressBar((progress/(len(deleteRows) + 3)) + typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
+            self._spreadSheet.worksheet(itemType).update("D2:D" + str(len(updateRows) + 1), updateRows)
+            printProgressBar(0.5 + typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
             progress += 1
-            self._spreadSheet.worksheet(itemType).insert_rows(newRows, row = 2)
-            printProgressBar((progress/(len(deleteRows) + 3)) + typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
+            self._spreadSheet.worksheet(itemType).insert_rows(newRows, row = 2 + len(oldRows))
+            printProgressBar(1 + typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
             typeProgress += 1
-            if requestCount > 35:
-                printProgressBar((progress/(len(deleteRows) + 3)) + typeProgress, countTypes, prefix = 'Pause for request limit:', suffix = 'Sent', length = 50)
-                requestCount = 0
-                time.sleep(60)
         self._spreadSheet.worksheet("Infos").update_cell(2, 1, self._currentDateFormatted)
         printProgressBar(countTypes, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
