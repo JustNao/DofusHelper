@@ -48,17 +48,11 @@ class Multicompte:
 
     
     def packetRead(self, msg):
-        try:
-            # print(protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data))
-            pass
-        except IndexError:
-            pass
         if msg.id == 5002 : 
             # 5002 PartyUpdateLightMessage
             # 9871 GameSynchronizingMessage
-            try:
-                packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
-            except IndexError:
+            packet = protocol.readMsg(msg)
+            if packet is None:
                 return
             try:
                 # for entity in packet['fighters']:
@@ -72,9 +66,8 @@ class Multicompte:
                 pass
         elif msg.id == 4730:
             # GameFightTurnStartMessage
-            try:
-                packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
-            except IndexError:
+            packet = protocol.readMsg(msg)
+            if packet is None:
                 return
             name = self.idToName(packet['id'])
             if name not in self.characters.keys() or self.characters[name].active:
