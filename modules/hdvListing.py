@@ -169,10 +169,7 @@ def warningPopup(self):
 def setNewPrice():
     global index
     item = sellsList[index][1]
-    try:
-        ui.changeText(sellsList[index + 1][1]['name'])
-    except IndexError:
-        ui.changeText("No more items")
+    ui.changeText(sellsList[index][1]['name'])
 
     if not "hdvAmount" in item:
         return
@@ -245,6 +242,7 @@ def setNewPrice():
     index += 1
     if index >= len(sellsList):
         # If it's the last item, don't need to load the next
+        ui.changeText("No more items")
         return
     ag.click(posSearch)
     time.sleep(0.5)
