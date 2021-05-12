@@ -10,6 +10,7 @@ from random import random
 from ui.gui import ui
 import locale
 from math import pow, ceil, log
+import PySimpleGUI as sg
 print('Sources imported !')
 
 locale.setlocale(locale.LC_ALL, '')
@@ -117,13 +118,15 @@ def getCurrentSells(packet):
 def getCurrentPrice(packet):
     if not 'hdvAmount' in sells[packet['genericId']]:
         sells[packet['genericId']]['hdvAmount'] = packet['minimalPrices']
-        setNewPrice()
+    setNewPrice()
 
 def packetRead(msg):
     global sellsList, index, posSearch, sellInfoPos, middleElementPos, selectPos
     if msg.id == 8157:
         # ExchangeStartedSellerMessage
-        packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
+        packet = protocol.readMsg(msg)
+        if packet is None:
+            return
         time.sleep(1)
         middleElementPos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\hdvMiddleElement.png', confidence = 0.75)
         try:
@@ -135,11 +138,12 @@ def packetRead(msg):
         ag.PAUSE = 0.3
         selectPos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\hdvSellItemClick.png', region = (sellInfoPos[0], sellInfoPos[1] - 20, 250, 40), grayscale = True, confidence = 0.75)
         try:
-            ag.click(ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\lot.png'), clicks = 2, interval = 0.05)
+            ag.click(ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\lot.png'), interval = 0.05)
         except AttributeError:
             pass
         getCurrentSells(packet)
         sellsList = list(sells.items())
+        ui.changeText(sellsList[0][1]['name'])
         time.sleep(1)
         print(Fore.YELLOW + "Starting item price update" + Fore.RESET)
         index = 0
@@ -159,15 +163,26 @@ def packetRead(msg):
         packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
         getCurrentPrice(packet)
 
+def warningPopup(self):
+        sg.Popup('WARNING', 'L\'item va être posté à un prix très éloigné du prix moyen estimé. Etes-vous sûr de vouloir le poster à ce prix ?')
+
 def setNewPrice():
     global index
     item = sellsList[index][1]
+    try:
+        ui.changeText(sellsList[index + 1][1]['name'])
+    except IndexError:
+        ui.changeText("No more items")
+
     if not "hdvAmount" in item:
         return
     itemCount = 0
     positionShift = 0
     firstItem = True
+    abort = False
     for unit in range(2,-1,-1):
+        if abort:
+            break
         unitCount = 0
         if (item['playerAmount'].count[unit]['quantity'] == 0) or (item['playerAmount'].count[unit]['postedPrice'] - item['hdvAmount'][unit] == 0):
             for i in range(item['playerAmount'].count[unit]['quantity']):
@@ -185,6 +200,7 @@ def setNewPrice():
                 ag.hotkey("ctrl", "v")
                 time.sleep(1)
             firstItem = False
+            initialUnitPositionShift = positionShift
             for i in range(item['playerAmount'].count[unit]['quantity']):
                 ag.click(selectPos[0], selectPos[1] + positionShift)
                 positionShift += 43
@@ -197,12 +213,23 @@ def setNewPrice():
             ag.typewrite(str(newPrice), interval = 0.05)
             ag.typewrite(['return'])
             
+            warned = False
             if (ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\warning.png') is not None):
-                ui.warningPopup()
                 print(Fore.RED + 'WARNING : price is very far from the estimated one. Do you confirm using the new price ?' + Fore.RESET)
-
+                warned = True
             while (ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\warning.png') is not None):
                 time.sleep(0.5)
+            
+            skipItem = "n"
+            if warned:
+                skipItem = input("Do you want to skip the item ? y/n\n")
+            if skipItem == "y":
+                abort = True
+                positionShift = initialUnitPositionShift
+                for i in range(item['playerAmount'].count[unit]['quantity']):
+                    ag.click(selectPos[0], selectPos[1] + positionShift)
+                    positionShift += 43
+                break
 
             searchIndex = 0
             ouiPos = None
@@ -212,9 +239,6 @@ def setNewPrice():
                 ouiPos = ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\oui.png', confidence = 0.75)
             if ouiPos is not None:
                 ag.click(ouiPos)
-            elif (unitCount > 1):
-                print("If there is a confirmation popup, i can't detect it. Otherwise, nothing is wrong, a single item just doesn't require confirmation")
-                time.sleep(3)
         time.sleep(unitCount*0.5 + random()/2)
 
 

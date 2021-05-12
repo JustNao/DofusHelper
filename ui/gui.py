@@ -63,7 +63,7 @@ class GraphicalInterface():
             if toggle:
                 moduleWindow['ON/OFF'].update(image_filename=imgList['off'])
             
-    def startUi(self):
+    def startUi(self): 
         t = threading.Thread(target=self.buildUi, name="GUI")
         t.start()
 
@@ -102,7 +102,8 @@ class GraphicalInterface():
         secondColumn = [
                     [sg.Radio("Chat Searcher", group_id = "CHOICE", key = 'chat')],
                     [sg.Radio("Multicompte Tool", group_id = "CHOICE", key = 'multi')],
-                    [sg.Radio("AvA Counter", group_id = "CHOICE", key = 'ava')]
+                    [sg.Radio("AvA Counter", group_id = "CHOICE", key = 'ava')],
+                    [sg.Radio("Ressources Price Listing", group_id = "CHOICE", key = 'price')]
         ]
 
         menuLayout =[
@@ -149,6 +150,8 @@ class GraphicalInterface():
                 self.initilisation(packetRead, 0)
             elif (self.userChoice == 'hdvMissing'):
                 self.startMissingItemsUi()
+            elif (self.userChoice == 'price'):
+                self.startPriceListingUi()
         except AttributeError:
             return
 
@@ -167,7 +170,7 @@ class GraphicalInterface():
                 sg.Button(image_filename=imgList['exit'], button_color=(sg.theme_background_color(
                 ), sg.theme_background_color()), border_width=0, key='EXIT', image_size=(30, 30))
             ],
-            [sg.Text("Position info", key="POS",
+            [sg.Text("Position info", key="INFO",
                      font=('Helvetica', 15, 'bold'))],
             [sg.HorizontalSeparator()],
             [sg.Image(filename=imgList['noDirection'], key="DIRECTION")],
@@ -208,11 +211,48 @@ class GraphicalInterface():
         # self.initilisation(packetRead, 0.3)
 
         layout = [
+            [sg.Text("Waiting for a tab click", key = "INFO", auto_size_text="true")],
             [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25','#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
         ]
         sg.theme('HDV')
         moduleWindow = sg.Window(
             'Données ventes', 
+            layout, 
+            resizable = True, 
+            element_justification = 'center', 
+            grab_anywhere = True,
+            size=(290, 75),
+            keep_on_top=True,
+            )
+
+        loaded = False
+        while True:
+            event, values = moduleWindow.read()
+            if event == sg.WIN_CLOSED:
+                self.stop(toggle = True)
+                break
+            elif event == "ON/OFF":
+                if not loaded:
+                    self.initilisation(packetRead, 0.3)
+                    loaded = True
+                else:
+                    self.load()
+        moduleWindow.close()
+
+    def startPriceListingUi(self):
+        global moduleWindow
+        from modules.pricesListing import PriceListing
+
+        packetRead = PriceListing().packetRead
+
+        layout = [
+            [sg.Text("Item index", key = "INFO", auto_size_text="true")],
+            [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25','#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
+        ]
+
+        sg.theme('HDV')
+        moduleWindow = sg.Window(
+            'Ressources Price Listing', 
             layout, 
             resizable = True, 
             element_justification = 'center', 
@@ -371,8 +411,8 @@ class GraphicalInterface():
         except KeyError:
             moduleWindow["IMAGE"].update(image_filename=imgList['tooFar'])
 
-    def changeText(self, pos):
-        moduleWindow["POS"].update(pos)
+    def changeText(self, info):
+        moduleWindow["INFO"].update(info)
 
     def changeDirection(self, dir="noDirection"):
         moduleWindow["DIRECTION"].update(filename=imgList[dir])
