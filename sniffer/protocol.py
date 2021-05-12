@@ -132,3 +132,10 @@ def write(type, json, data=None, random_hash=True) -> Data:
         hash = bytes(random.getrandbits(8) for _ in range(48))
         data.write(hash)
     return data
+
+def readMsg(msg):
+    try:
+        return read(msg_from_id[msg.id]["name"], msg.data)
+    except AssertionError:
+        print("Error in packet data")
+        return None
