@@ -1,12 +1,13 @@
 print('Importing sources ...')
 
+from .pricesListing import kamasToString, craftPrice
 from pyasn1.type.univ import Boolean
 from sniffer import protocol
 import time, datetime
 from colorama import Fore
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from sources.item import gameItems, itemToName
+from sources.item import gameItems, itemToName, ressourcesId, recipes, prices
 print('Sources imported !')
 
 # Print iterations progress
@@ -160,8 +161,9 @@ class MissingItemLookup:
                                 dayCount = itemAlreadyMissing['Jours consécutifs'] + 1
                             else:
                                 dayCount = itemAlreadyMissing['Jours consécutifs']
-                            # effects = ', '.join(dbItem['effects'])
-                            oldRows[self._indexOf(itemToName[dbItem['id']], self._alreadyMissingItems[itemType])] = [dayCount]
+                            effects = ', '.join(dbItem['effects'])
+                            price = kamasToString(craftPrice(dbItem['id']))
+                            oldRows[self._indexOf(itemToName[dbItem['id']], self._alreadyMissingItems[itemType])] = [effects, price, dayCount]
                             break
 
             for item in itemList.values():
@@ -173,8 +175,9 @@ class MissingItemLookup:
                         break
                 if not alreadyMissing:
                     effects = ', '.join(item['effects'])
+                    price = kamasToString(craftPrice(item['id']))
                     newRows.append(
-                        [item['level'], itemToName[item['id']], effects, 0, ""]
+                        [item['level'], itemToName[item['id']], effects, price,  0, ""]
                     )
 
             progress = 1
@@ -190,7 +193,7 @@ class MissingItemLookup:
             #     printProgressBar((progress/(len(deleteRows) + 3)) + typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
             #     progress += 1
             # self._spreadSheet.worksheet(itemType).delete_rows(2, len(self._alreadyMissingItems[itemType]))
-            self._spreadSheet.worksheet(itemType).update("D2:D" + str(len(updateRows) + 1), updateRows)
+            self._spreadSheet.worksheet(itemType).update("C2:E" + str(len(updateRows) + 1), updateRows)
             printProgressBar(0.5 + typeProgress, countTypes, prefix = 'Progress:', suffix = 'Sent', length = 50)
             progress += 1
             self._spreadSheet.worksheet(itemType).insert_rows(newRows, row = 2 + len(oldRows))

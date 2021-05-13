@@ -36,9 +36,7 @@ effects = {
     418: 'Do Crit',
     419: 'Do Crit',
     430: 'Do Neutre',
-    431: 'Do Neutre',
-    752: "Fuite",
-    754: "Fuite"
+    431: 'Do Neutre'
 }
 for item in itemJs:
     interestingEffects = []
@@ -51,8 +49,7 @@ for item in itemJs:
             'nameId' : item['nameId'],
             'level' : item['level'],
             'craftable': item['recipeSlots'] > 0,
-            'effects': interestingEffects,
-            'usedInCrafting': len(item['recipeIds']) > 0
+            'effects': interestingEffects
             })
     except KeyError:
         gameItems[item['typeId']] = [
@@ -61,8 +58,7 @@ for item in itemJs:
             'nameId' : item['nameId'],
             'level' : item['level'],
             'craftable': item['recipeSlots'] > 0,
-            'effects': interestingEffects,
-            'usedInCrafting': len(item['recipeIds']) > 0
+            'effects': interestingEffects
             }
         ]
 
