@@ -103,7 +103,8 @@ class GraphicalInterface():
                     [sg.Radio("Chat Searcher", group_id = "CHOICE", key = 'chat')],
                     [sg.Radio("Multicompte Tool", group_id = "CHOICE", key = 'multi')],
                     [sg.Radio("AvA Counter", group_id = "CHOICE", key = 'ava')],
-                    [sg.Radio("Ressources Price Listing", group_id = "CHOICE", key = 'price')]
+                    [sg.Radio("Ressources Price Listing", group_id = "CHOICE", key = 'priceListing')],
+                    [sg.Radio("Price Computer", group_id = "CHOICE", key = 'priceCompute')]
         ]
 
         menuLayout =[
@@ -150,8 +151,10 @@ class GraphicalInterface():
                 self.initilisation(packetRead, 0)
             elif (self.userChoice == 'hdvMissing'):
                 self.startMissingItemsUi()
-            elif (self.userChoice == 'price'):
+            elif (self.userChoice == 'priceListing'):
                 self.startPriceListingUi()
+            elif (self.userChoice == 'priceCompute'):
+                self.startPriceComputerUi()
         except AttributeError:
             return
 
@@ -272,6 +275,39 @@ class GraphicalInterface():
                     loaded = True
                 else:
                     self.load()
+        moduleWindow.close()
+
+    def startPriceComputerUi(self):
+        global moduleWindow
+        from modules.priceCompute import PriceComputer
+
+        packetRead = PriceComputer().packetRead
+        self.initilisation(packetRead, 0.3)
+
+        layout = [
+            [sg.Text("Item Price", key = "INFO", size = (15, 1), text_color = "#ffea00", font = ('Helvetica', 30))],
+            [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25','#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0), visible= False)]
+        ]
+
+        sg.theme('HDV')
+        moduleWindow = sg.Window(
+            'Ressources Price Listing', 
+            layout, 
+            no_titlebar=True,
+            resizable = True, 
+            element_justification = 'center', 
+            grab_anywhere = True,
+            keep_on_top=True,
+            size = (250, 70)
+            )
+
+        while True:
+            event, values = moduleWindow.read()
+            if event == sg.WIN_CLOSED:
+                self.stop(toggle = True)
+                break
+            elif event == "ON/OFF":
+                self.load()
         moduleWindow.close()
         
     def startSearcherUi(self):
