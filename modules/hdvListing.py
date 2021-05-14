@@ -168,8 +168,11 @@ def warningPopup(self):
 
 def setNewPrice():
     global index
-    item = sellsList[index][1]
-    ui.changeText(sellsList[index][1]['name'])
+    try:
+        item = sellsList[index][1]
+        ui.changeText(sellsList[index][1]['name'])
+    except IndexError:
+        return
 
     if not "hdvAmount" in item:
         return
