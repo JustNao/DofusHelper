@@ -170,7 +170,7 @@ def setNewPrice():
     global index
     try:
         item = sellsList[index][1]
-        ui.changeText(sellsList[index][1]['name'])
+        ui.changeText(sellsList[index][1]['name'] + " (" + str(index + 1) + "/" + str(len(sellsList)) + ")")
     except IndexError:
         return
 
@@ -235,7 +235,7 @@ def setNewPrice():
             ouiPos = None
             while (ouiPos is None) and (searchIndex < 5):
                 searchIndex += 1
-                time.sleep(0.1)
+                time.sleep(0.2)
                 ouiPos = ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\oui.png', confidence = 0.75)
             if ouiPos is not None:
                 ag.click(ouiPos)

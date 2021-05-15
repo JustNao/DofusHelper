@@ -214,7 +214,7 @@ class GraphicalInterface():
         # self.initilisation(packetRead, 0.3)
 
         layout = [
-            [sg.Text("Waiting for a tab click", key = "INFO", auto_size_text="true")],
+            [sg.Text("Waiting for a tab click", key = "INFO", size = (30, 1))],
             [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25','#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
         ]
         sg.theme('HDV')
