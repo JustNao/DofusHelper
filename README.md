@@ -56,6 +56,14 @@ Le module recupère l'ID de chaque personnage en entrant en combat, et l'associe
 
 Une fois lancé, à chaque changement de map un comptage des joueurs présents par alliance sera fait (utile en cas de AvA où des piles sont faites pour compter le nomber de joueurs).
 
+### Price Computer
+
+Ouvre une mini fenêtre en premier plan. En jeu, envoyez un message de groupe (obligatoirement) avec **$price** suivi d'un link d'item (shift + clic ou clic droit et insérer un item dans le chat). Le prix de craft sera affiché dans la mini fenêtre.
+
+### Price Listing
+
+Liste le prix de tous les items en hdv ressource. Extrêmement lent (+ de 3 heures de scan), et utile pour vous uniquement si vous voulez absolument changer le prix des items en interne. Le prix de chaque item peut se retrouver dans sources/gameRessources/prices.json, trié par l'ID de l'item (que vous pouvez soit retrouver dans les fichiers du jeu, soit sur l'encyclopédie du site dans l'URL de l'item).
+
 ### Fail Safe
 
 Dans n'importe quel module, quand le bot pixel est utilisé, placer la souris dans le coin supérieur gauche de l'écran stoppera le bot (il faudra relancer l'application pour relancer le bot).
