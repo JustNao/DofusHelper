@@ -38,6 +38,7 @@ class GraphicalInterface():
                                                   'SLIDER_DEPTH': 0,
                                                   'PROGRESS_DEPTH': 0}
         sg.set_options(suppress_raise_key_errors=True)
+        sg.theme('HDV')
     
     def initilisation(self, action, pause = 0):
         ag.PAUSE = pause
@@ -60,12 +61,19 @@ class GraphicalInterface():
             self.stopSniff()
             self.stopSniff = None
             print(Fore.YELLOW + "Module stopped" + Fore.RESET)
-            if toggle:
-                moduleWindow['ON/OFF'].update(image_filename=imgList['off'])
+            try:
+                if toggle:
+                    moduleWindow['ON/OFF'].update(image_filename=imgList['off'])
+            except TclError:
+                pass
             
     def startUi(self): 
         t = threading.Thread(target=self.buildUi, name="GUI")
         t.start()
+
+    def closeModuleWindow(self, moduleWindow):
+        moduleWindow.close()
+        self.buildUi()
 
     def buildUi(self):
         global imgList, application_path
@@ -88,9 +96,6 @@ class GraphicalInterface():
 
         imgList = {fileName(str(f)): imgFolder + '\\' +
                    f for f in os.listdir(imgFolder) if '.png' in f}
-
-        # MENU #
-        sg.theme('HDV')
 
         firstColumn = [
                     [sg.Radio("Treasure Hunt Bot", default = True, group_id = "CHOICE", key = 'huntBot')],
@@ -135,6 +140,7 @@ class GraphicalInterface():
                         break
                 break
             elif (event == sg.WIN_CLOSED):
+                self.userChoice = "quit"
                 break
         menuWindow.close()
         try:
@@ -205,7 +211,8 @@ class GraphicalInterface():
                 break
             moduleWindow.refresh()
 
-        moduleWindow.close()
+        sg.theme('HDV')
+        self.closeModuleWindow(moduleWindow)
 
     def startHdvUi(self):
         global moduleWindow
@@ -240,7 +247,7 @@ class GraphicalInterface():
                     loaded = True
                 else:
                     self.load()
-        moduleWindow.close()
+        self.closeModuleWindow(moduleWindow)
 
     def startPriceListingUi(self):
         global moduleWindow
@@ -275,7 +282,7 @@ class GraphicalInterface():
                     loaded = True
                 else:
                     self.load()
-        moduleWindow.close()
+        self.closeModuleWindow(moduleWindow)
 
     def startPriceComputerUi(self):
         global moduleWindow
@@ -308,7 +315,7 @@ class GraphicalInterface():
                 break
             elif event == "ON/OFF":
                 self.load()
-        moduleWindow.close()
+        self.closeModuleWindow(moduleWindow)
         
     def startSearcherUi(self):
         global moduleWindow
@@ -341,6 +348,7 @@ class GraphicalInterface():
                 else:
                     self.load()
                 searcher.update(values['-INPUT-'])
+        self.closeModuleWindow(moduleWindow)
 
     def startMulticompteUi(self):
         global moduleWindow
@@ -387,6 +395,7 @@ class GraphicalInterface():
                 from json import dump
                 with open('config/multicompte.json', 'w') as outFile:
                     dump(characters, outFile)
+        self.closeModuleWindow(moduleWindow)
 
     def startMissingItemsUi(self):
         global moduleWindow
@@ -423,8 +432,7 @@ class GraphicalInterface():
                 self.stop()
                 break
 
-        moduleWindow.close()
-        return
+        self.closeModuleWindow(moduleWindow)
 
 
     def dataUpdate(self, data, colors = None):
