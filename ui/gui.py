@@ -50,8 +50,8 @@ class GraphicalInterface():
             self.stopSniff = self.startSniff(self.packetRead)
             print(Fore.GREEN + "Module started !" + Fore.RESET)
             try:
-                moduleWindow['ON/OFF'].update(image_filename=imgList['on'])
-            except NameError:
+                self._moduleWindow['ON/OFF'].update(image_filename=imgList['on'])
+            except:
                 pass
         else:
             self.stop(toggle = True) 
@@ -63,7 +63,7 @@ class GraphicalInterface():
             print(Fore.YELLOW + "Module stopped" + Fore.RESET)
             try:
                 if toggle:
-                    moduleWindow['ON/OFF'].update(image_filename=imgList['off'])
+                    self._moduleWindow['ON/OFF'].update(image_filename=imgList['off'])
             except TclError:
                 pass
             
@@ -71,8 +71,8 @@ class GraphicalInterface():
         t = threading.Thread(target=self.buildUi, name="GUI")
         t.start()
 
-    def closeModuleWindow(self, moduleWindow):
-        moduleWindow.close()
+    def closeModuleWindow(self):
+        self._moduleWindow.close()
         self.buildUi()
 
     def buildUi(self):
@@ -165,7 +165,6 @@ class GraphicalInterface():
             return
 
     def startTreasureHuntUi(self):
-        global moduleWindow
 
         from modules.treasureHuntBot import TreasureHuntHelper
         self.initilisation(TreasureHuntHelper(self.botting).packetRead, 0)
@@ -187,7 +186,7 @@ class GraphicalInterface():
                 sg.theme_background_color(), sg.theme_background_color()), border_width=0, key="IMAGE")]
         ]
 
-        moduleWindow = sg.Window(
+        self._moduleWindow = sg.Window(
             title="Treasure Hunt Helper",
             no_titlebar=True,
             grab_anywhere=True,
@@ -200,7 +199,7 @@ class GraphicalInterface():
             element_justification = CENTER)
 
         while True:
-            event, values = moduleWindow.read(timeout=15000)
+            event, values = self._moduleWindow.read(timeout=15000)
             if event == "IMAGE":
                 if self.found is not None:
                     self.clickNextStep()
@@ -209,13 +208,12 @@ class GraphicalInterface():
             elif (event == sg.WIN_CLOSED) or (event == "EXIT"):
                 self.stop(toggle = True)
                 break
-            moduleWindow.refresh()
+            self._moduleWindow.refresh()
 
         sg.theme('HDV')
-        self.closeModuleWindow(moduleWindow)
+        self.closeModuleWindow()
 
     def startHdvUi(self):
-        global moduleWindow
         from modules.hdvListing import packetRead
 
         # self.initilisation(packetRead, 0.3)
@@ -225,7 +223,7 @@ class GraphicalInterface():
             [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25','#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
         ]
         sg.theme('HDV')
-        moduleWindow = sg.Window(
+        self._moduleWindow = sg.Window(
             'Données ventes', 
             layout, 
             resizable = True, 
@@ -237,7 +235,7 @@ class GraphicalInterface():
 
         loaded = False
         while True:
-            event, values = moduleWindow.read()
+            event, values = self._moduleWindow.read()
             if event == sg.WIN_CLOSED:
                 self.stop(toggle = True)
                 break
@@ -247,10 +245,9 @@ class GraphicalInterface():
                     loaded = True
                 else:
                     self.load()
-        self.closeModuleWindow(moduleWindow)
+        self.closeModuleWindow()
 
     def startPriceListingUi(self):
-        global moduleWindow
         from modules.pricesListing import PriceListing
 
         packetRead = PriceListing().packetRead
@@ -261,7 +258,7 @@ class GraphicalInterface():
         ]
 
         sg.theme('HDV')
-        moduleWindow = sg.Window(
+        self._moduleWindow = sg.Window(
             'Ressources Price Listing', 
             layout, 
             resizable = True, 
@@ -272,7 +269,7 @@ class GraphicalInterface():
 
         loaded = False
         while True:
-            event, values = moduleWindow.read()
+            event, values = self._moduleWindow.read()
             if event == sg.WIN_CLOSED:
                 self.stop(toggle = True)
                 break
@@ -282,10 +279,9 @@ class GraphicalInterface():
                     loaded = True
                 else:
                     self.load()
-        self.closeModuleWindow(moduleWindow)
+        self.closeModuleWindow()
 
     def startPriceComputerUi(self):
-        global moduleWindow
         from modules.priceCompute import PriceComputer
 
         packetRead = PriceComputer().packetRead
@@ -297,7 +293,7 @@ class GraphicalInterface():
         ]
 
         sg.theme('HDV')
-        moduleWindow = sg.Window(
+        self._moduleWindow = sg.Window(
             'Ressources Price Listing', 
             layout, 
             no_titlebar=True,
@@ -309,16 +305,15 @@ class GraphicalInterface():
             )
 
         while True:
-            event, values = moduleWindow.read()
+            event, values = self._moduleWindow.read()
             if event == sg.WIN_CLOSED:
                 self.stop(toggle = True)
                 break
             elif event == "ON/OFF":
                 self.load()
-        self.closeModuleWindow(moduleWindow)
+        self.closeModuleWindow()
         
     def startSearcherUi(self):
-        global moduleWindow
         from modules.stringSearch import Searcher
         sg.theme = 'HDV'
         layout = [
@@ -331,12 +326,12 @@ class GraphicalInterface():
             '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
         ]
 
-        moduleWindow = sg.Window('Chat Searcher', layout, finalize = True, element_justification= 'center')
+        self._moduleWindow = sg.Window('Chat Searcher', layout, finalize = True, element_justification= 'center')
 
         loaded = False
         searcher = Searcher()
         while True:
-            event, values = moduleWindow.read()
+            event, values = self._moduleWindow.read()
 
             if event == sg.WIN_CLOSED:
                 self.stop(toggle = True)
@@ -348,10 +343,9 @@ class GraphicalInterface():
                 else:
                     self.load()
                 searcher.update(values['-INPUT-'])
-        self.closeModuleWindow(moduleWindow)
+        self.closeModuleWindow()
 
     def startMulticompteUi(self):
-        global moduleWindow
         from modules.multicompte import Multicompte
 
         def rowElement(ind):
@@ -361,19 +355,19 @@ class GraphicalInterface():
         layout += [[sg.Button('Add character', key = '-ADD-'), sg.Button('Save config', key = '-SAVE-')]]
         layout += [[sg.Button(image_filename=imgList['off'], button_color=('#2c2e25',
             '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]]
-        moduleWindow = sg.Window('Multicompte Tool', layout, element_justification = 'center')
+        self._moduleWindow = sg.Window('Multicompte Tool', layout, element_justification = 'center')
 
         characterInd = 0
         loaded = False
 
         while True:
-            event, values = moduleWindow.read()
+            event, values = self._moduleWindow.read()
 
             if event == sg.WIN_CLOSED:
                 self.stop()
                 break
             elif (event == '-ADD-') and (characterInd < 8):
-                moduleWindow['ROW' + str(characterInd)].update(visible = True)
+                self._moduleWindow['ROW' + str(characterInd)].update(visible = True)
                 characterInd += 1
             elif event == 'ON/OFF':
                 manager = Multicompte(values)
@@ -395,10 +389,9 @@ class GraphicalInterface():
                 from json import dump
                 with open('config/multicompte.json', 'w') as outFile:
                     dump(characters, outFile)
-        self.closeModuleWindow(moduleWindow)
+        self.closeModuleWindow()
 
     def startMissingItemsUi(self):
-        global moduleWindow
         from modules.hdvMissingItems import MissingItemLookup
         missingItems = MissingItemLookup(self)
         if self._abortWindow:
@@ -411,7 +404,7 @@ class GraphicalInterface():
             [sg.Button(button_text="Save", border_width=0, key="save", pad=(10, 0))]
         ]
 
-        moduleWindow = sg.Window(
+        self._moduleWindow = sg.Window(
             'Missing Items Excel', 
             layout, 
             finalize = True, 
@@ -422,7 +415,7 @@ class GraphicalInterface():
             )
 
         while True:
-            event, values = moduleWindow.read()
+            event, values = self._moduleWindow.read()
 
             if event == sg.WIN_CLOSED:
                 self.stop()
@@ -432,34 +425,34 @@ class GraphicalInterface():
                 self.stop()
                 break
 
-        self.closeModuleWindow(moduleWindow)
+        self.closeModuleWindow()
 
 
     def dataUpdate(self, data, colors = None):
-        moduleWindow['-TABLE-'].update(values = data, row_colors = colors)
-        moduleWindow.bring_to_front()
-        moduleWindow['-BAR-'].update(current_count = 100, visible = False)
-        # moduleWindow['-BAR-'].update_bar(0)
-        moduleWindow['-PERCENT-'].update(visible  = True, disabled = False)
-        moduleWindow['-AUTOMATE-'].update(visible = True)
+        self._moduleWindow['-TABLE-'].update(values = data, row_colors = colors)
+        self._moduleWindow.bring_to_front()
+        self._moduleWindow['-BAR-'].update(current_count = 100, visible = False)
+        # self._moduleWindow['-BAR-'].update_bar(0)
+        self._moduleWindow['-PERCENT-'].update(visible  = True, disabled = False)
+        self._moduleWindow['-AUTOMATE-'].update(visible = True)
         self.load()
 
     def updateProgressBar(self, value):
-        moduleWindow['-BAR-'].update_bar(value)
+        self._moduleWindow['-BAR-'].update_bar(value)
 
     def changeImg(self, imgName):
         if (imgName == "found") or (imgName == "checkpoint") or (imgName == "combat"):
             self.found = imgName
         try:
-            moduleWindow["IMAGE"].update(image_filename=imgList[imgName])
+            self._moduleWindow["IMAGE"].update(image_filename=imgList[imgName])
         except KeyError:
-            moduleWindow["IMAGE"].update(image_filename=imgList['tooFar'])
+            self._moduleWindow["IMAGE"].update(image_filename=imgList['tooFar'])
 
     def changeText(self, info):
-        moduleWindow["INFO"].update(info)
+        self._moduleWindow["INFO"].update(info)
 
     def changeDirection(self, dir="noDirection"):
-        moduleWindow["DIRECTION"].update(filename=imgList[dir])
+        self._moduleWindow["DIRECTION"].update(filename=imgList[dir])
 
     def clickNextStep(self):
         currentX, currentY = ag.position()
