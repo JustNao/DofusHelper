@@ -22,8 +22,7 @@ class TreasureHuntHelper():
         DEBUG = False
         print("Treasure helper initialized")
         self.botting = bot
-        # CurrentMap, TreasureHuntMessage, TreasurePOI, TreasureHinT, MapComplementaryInformationsDataMessage, FightStart
-        self.interestingPackets = [7033, 3696, 7529, 9917, 2291, 5072, 9401]
+        
         self.playerPos = self.Position()
         self.hintPos = self.Hint()
         self.timeStart = None
@@ -113,21 +112,26 @@ class TreasureHuntHelper():
         ag.moveTo(currentMousePos)
 
     def packetRead(self, msg):
-        if msg.id in self.interestingPackets:
-            try:
-                packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
-            except KeyError:
-                print("KeyError ", msg.id)
-                return
-            if msg.id == 7033:  # Changement de Map
-                self.changeMap(packet)
-            elif msg.id == 3696:  # Nouvelle étape de chasse aux trésors
-                self.huntNewStep(packet)
-            elif (msg.id == 5072):  # Chargement de carte, recherche d'un phorreur
-                self.mapContentAnalyse(packet)
-            elif (msg.id == (4119 or 9401)):
-                # En entrant en combat, on met en pause le sniffer pour éviter les problèmes
-                g.ui.load()
+        # CurrentMap, TreasureHuntMessage, TreasurePOI, TreasureHinT, MapComplementaryInformationsDataMessage, FightStart
+        self.interestingPackets = [7033, 3696, 7529, 9917, 2291, 5072, 9401]
+        try:
+            packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
+        except KeyError:
+            print("KeyError ", msg.id)
+            return
+        if msg.id == 3006:  # Changement de Map
+            # CurrentMapMessage
+            self.changeMap(packet)
+        elif msg.id == 9795:  # Nouvelle étape de chasse aux trésors
+            # TreasureHuntMessage
+            self.huntNewStep(packet)
+        elif (msg.id == 1152):  # Chargement de carte, recherche d'un phorreur
+            # MapComplementaryInformationsDataMessage
+            self.mapContentAnalyse(packet)
+        elif (msg.id == (4119 or 9401)):
+            # 9053, GameFightStartingMessage
+            # En entrant en combat, on met en pause le sniffer pour éviter les problèmes
+            g.ui.load()
         if DEBUG:
             print(protocol.msg_from_id[msg.id]["name"])
 

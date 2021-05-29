@@ -74,8 +74,8 @@ class PriceListing:
 
     def packetRead(self, msg):
         # print(protocol.msg_from_id[msg.id]['name'], msg.id, sep=", ")
-        if msg.id == 8765 : 
-            # 8765, ExchangeStartedBidBuyerMessage
+        if msg.id == 1753 : 
+            # 1753, ExchangeStartedBidBuyerMessage
             packet = protocol.readMsg(msg)
             if packet is None or self._posSearch is not None:
                 return
@@ -90,8 +90,8 @@ class PriceListing:
             t = threading.Thread(target=self.searchBot, name="Search Bot", args= (packet,))
             t.start()
             
-        elif msg.id == 3270:
-            # 3270, ExchangeTypesItemsExchangerDescriptionForUserMessage
+        elif msg.id == 2638:
+            # 2638, ExchangeTypesItemsExchangerDescriptionForUserMessage
             packet = protocol.readMsg(msg)
             if packet is None:
                 return

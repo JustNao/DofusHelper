@@ -122,7 +122,7 @@ def getCurrentPrice(packet):
 
 def packetRead(msg):
     global sellsList, index, posSearch, sellInfoPos, middleElementPos, selectPos
-    if msg.id == 8157:
+    if msg.id == 1313:
         # ExchangeStartedSellerMessage
         packet = protocol.readMsg(msg)
         if packet is None:
@@ -158,7 +158,7 @@ def packetRead(msg):
         time.sleep(1)
         ag.click(sellInfoPos)
 
-    elif msg.id == 4848:
+    elif msg.id == 6179:
         # ExchangeBidPriceForSellerMessage
         packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
         getCurrentPrice(packet)

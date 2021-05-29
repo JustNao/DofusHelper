@@ -48,8 +48,8 @@ class Multicompte:
 
     
     def packetRead(self, msg):
-        if msg.id == 5002 : 
-            # 5002 PartyUpdateLightMessage
+        if msg.id == 3775 : 
+            # 3775 PartyUpdateLightMessage
             # 9871 GameSynchronizingMessage
             packet = protocol.readMsg(msg)
             if packet is None:
@@ -64,7 +64,7 @@ class Multicompte:
                     print("Setting up", charName)
             except KeyError:
                 pass
-        elif msg.id == 4730:
+        elif msg.id == 3049:
             # GameFightTurnStartMessage
             packet = protocol.readMsg(msg)
             if packet is None:

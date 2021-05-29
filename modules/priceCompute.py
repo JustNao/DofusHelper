@@ -8,8 +8,8 @@ print('Sources imported !')
 class PriceComputer:
     def packetRead(self, msg):
         # print(msg.id, protocol.msg_from_id[msg.id]['name'], sep = ', ')
-        if msg.id == 8321:
-            # 8321, ChatServerWithObjectMessage
+        if msg.id == 1313:
+            # 1313, ExchangeStartedSellerMessage
             packet = protocol.readMsg(msg)
             if packet is None:
                 return

@@ -9,7 +9,8 @@ class Searcher:
         self.update(needle)
 
     def packetRead(self, msg):
-        if msg.id == 202:
+        if msg.id == 179:
+            # ChatClientMultiMessage
             packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
             found = any(str.lower() in packet['content'].lower() for str in self.needle)
             if found:
