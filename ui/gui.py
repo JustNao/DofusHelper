@@ -320,7 +320,7 @@ class GraphicalInterface():
         
     def startSearcherUi(self):
         from modules.stringSearch import Searcher
-        sg.theme = 'HDV'
+        sg.theme('HDV')
         layout = [
             [sg.Multiline(size = (50, 5),
             key = '-INPUT-', 
@@ -352,7 +352,7 @@ class GraphicalInterface():
 
     def startNomansland(self):
         from modules.nomanslandSniffer import Nomansland
-        sg.theme = 'HDV'
+        sg.theme('HDV')
         layout = [
             [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25',
             '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
@@ -430,7 +430,7 @@ class GraphicalInterface():
         self.initilisation(missingItems.packetRead, 0)
 
 
-        sg.theme = 'HDV'
+        sg.theme('HDV')
         layout = [
             [sg.Button(button_text="Save", border_width=0, key="save", pad=(10, 0))]
         ]
