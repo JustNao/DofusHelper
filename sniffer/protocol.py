@@ -139,3 +139,6 @@ def readMsg(msg):
     except AssertionError:
         print("Error in packet data")
         return None
+    except IndexError:
+        print("Weird packet found, flushing")
+        return None
