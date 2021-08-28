@@ -34,6 +34,10 @@ def npcToName(id):
     return name    
 
 def monsterToName(id):
-    nameId = [obj for obj in monsterJs if obj['id']==id][0]['nameId']
-    name = i18n['texts'][str(nameId)]
-    return name
+    try:
+        nameId = [obj for obj in monsterJs if obj['id']==id][0]['nameId']
+        name = i18n['texts'][str(nameId)]
+        return name
+    except IndexError:
+        print("Couldn't identify", id)
+        return ''
