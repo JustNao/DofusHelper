@@ -114,26 +114,28 @@ class TreasureHuntHelper():
     def packetRead(self, msg):
         # CurrentMap, TreasureHuntMessage, TreasurePOI, TreasureHinT, MapComplementaryInformationsDataMessage, FightStart
         self.interestingPackets = [7033, 3696, 7529, 9917, 2291, 5072, 9401]
-        try:
-            packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
-        except KeyError:
-            print("KeyError ", msg.id)
+        packet = protocol.readMsg(msg)
+        if not packet:
             return
-        if msg.id == 3006:  # Changement de Map
+        name = protocol.msg_from_id[msg.id]["name"]
+
+        if name == "CurrentMapMessage":  # Changement de Map
             # CurrentMapMessage
             self.changeMap(packet)
-        elif msg.id == 9795:  # Nouvelle étape de chasse aux trésors
+        elif name == "TreasureHuntMessage":  # Nouvelle étape de chasse aux trésors
             # TreasureHuntMessage
             self.huntNewStep(packet)
-        elif (msg.id == 1152):  # Chargement de carte, recherche d'un phorreur
+        elif name == "MapComplementaryInformationsDataMessage":  # Chargement de carte, recherche d'un phorreur
             # MapComplementaryInformationsDataMessage
             self.mapContentAnalyse(packet)
-        elif (msg.id == (4119 or 9401)):
+        # elif (msg.id == (4119 or 9401)):
+        elif name == "GameFightStartingMessage":
             # 9053, GameFightStartingMessage
             # En entrant en combat, on met en pause le sniffer pour éviter les problèmes
             g.ui.load()
+            
         if DEBUG:
-            print(protocol.msg_from_id[msg.id]["name"])
+            print(msg.id + ", " + name)
 
     def changeMap(self, packet):
         self.playerPos = self.Position(
