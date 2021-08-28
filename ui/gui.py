@@ -103,7 +103,8 @@ class GraphicalInterface():
                     [sg.Radio("Treasure Hunt Bot", default = True, group_id = "CHOICE", key = 'huntBot')],
                     [sg.Radio("Treasure Hunt Helper", group_id = "CHOICE", key = 'huntHelper')],
                     [sg.Radio("HDV Items Listing", group_id = "CHOICE", key = 'hdv')],
-                    [sg.Radio("HDV Missing Items", group_id = "CHOICE", key = 'hdvMissing')]
+                    [sg.Radio("HDV Missing Items", group_id = "CHOICE", key = 'hdvMissing')],
+                    [sg.Radio("No man's land", group_id = "CHOICE", key = 'nomansland')]
         ]
         
         secondColumn = [
@@ -163,6 +164,8 @@ class GraphicalInterface():
                 self.startPriceListingUi()
             elif (self.userChoice == 'priceCompute'):
                 self.startPriceComputerUi()
+            elif (self.userChoice == 'nomansland'):
+                self.startNomansland()
         except AttributeError:
             return
 
@@ -345,6 +348,32 @@ class GraphicalInterface():
                 else:
                     self.load()
                 searcher.update(values['-INPUT-'])
+        self.closeModuleWindow()
+
+    def startNomansland(self):
+        from modules.nomanslandSniffer import Nomansland
+        sg.theme = 'HDV'
+        layout = [
+            [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25',
+            '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
+        ]
+
+        self._moduleWindow = sg.Window('Autopilotage Searcher', layout, finalize = True, element_justification= 'center')
+
+        loaded = False
+        searcher = Nomansland()
+        while True:
+            event, values = self._moduleWindow.read()
+
+            if event == sg.WIN_CLOSED:
+                self.stop(toggle = True)
+                break
+            elif event == 'ON/OFF':
+                if not loaded:
+                    self.initilisation(searcher.packetRead, 0)
+                    loaded = True
+                else:
+                    self.load()
         self.closeModuleWindow()
 
     def startMulticompteUi(self):
