@@ -54,7 +54,7 @@ class TreasureHuntHelper():
             return '[' + str(self.x) + ',' + str(self.y) + ']'
 
     class Position:
-        def __init__(self, posX=0, posY=0):
+        def __init__(self, posX=-25, posY=-36):
             self.x = posX
             self.y = posY
 
