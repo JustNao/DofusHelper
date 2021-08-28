@@ -233,6 +233,11 @@ def on_msg(msg):
     print(msg.data)
     print(Msg.from_json(msg.json()).data)
 
+def flushBuffers():
+    global buf1, buf2
+    print("Flushing buffers")
+    buf1 = Buffer()
+    buf2 = Buffer()
 
 if __name__ == "__main__":
     stop = launch_in_thread(on_msg)

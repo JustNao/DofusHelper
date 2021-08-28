@@ -1,5 +1,6 @@
 from tkinter import TclError
 from tkinter.constants import CENTER, DISABLED, RIGHT, LEFT
+from sniffer.network import flushBuffers
 import PySimpleGUI as sg
 import os, sys
 import threading
@@ -47,6 +48,7 @@ class GraphicalInterface():
 
     def load(self):
         if self.stopSniff is None:
+            flushBuffers()
             self.stopSniff = self.startSniff(self.packetRead)
             print(Fore.GREEN + "Module started !" + Fore.RESET)
             try:
