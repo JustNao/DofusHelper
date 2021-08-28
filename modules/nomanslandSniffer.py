@@ -1,6 +1,7 @@
 print('Importing sources ...')
 from sniffer import protocol
 from sources.id import monsterToName
+from sources.item import itemToName
 from .pricesListing import kamasToString
 from colorama import Fore
 from ui.gui import ui
