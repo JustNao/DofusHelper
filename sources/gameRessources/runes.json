@@ -1,0 +1,382 @@
+{
+    "11648": {
+        "name": "Rune Pa Ret Pme",
+        "poids": 21
+    },
+    "11649": {
+        "name": "Rune Do Pou",
+        "poids": 5
+    },
+    "11650": {
+        "name": "Rune Pa Do Pou",
+        "poids": 15
+    },
+    "11651": {
+        "name": "Rune Ré Pou",
+        "poids": 2
+    },
+    "11652": {
+        "name": "Rune Pa Ré Pou",
+        "poids": 6
+    },
+    "11653": {
+        "name": "Rune Do Cri",
+        "poids": 5
+    },
+    "11654": {
+        "name": "Rune Pa Do Cri",
+        "poids": 15
+    },
+    "11655": {
+        "name": "Rune Ré Cri",
+        "poids": 2
+    },
+    "7560": {
+        "name": "Rune Ré Per Eau",
+        "poids": 6
+    },
+    "11656": {
+        "name": "Rune Pa Ré Cri",
+        "poids": 6
+    },
+    "1545": {
+        "name": "Rune Pa Fo",
+        "poids": 3
+    },
+    "7433": {
+        "name": "Rune Cri",
+        "poids": 10
+    },
+    "11657": {
+        "name": "Rune Do Terre",
+        "poids": 5
+    },
+    "19337": {
+        "name": "Rune Pa So",
+        "poids": 30
+    },
+    "1546": {
+        "name": "Rune Pa Sa",
+        "poids": 9
+    },
+    "7434": {
+        "name": "Rune So",
+        "poids": 10
+    },
+    "11658": {
+        "name": "Rune Pa Do Terre",
+        "poids": 15
+    },
+    "19338": {
+        "name": "Rune Pa Ré Air",
+        "poids": 6
+    },
+    "1547": {
+        "name": "Rune Pa Ine",
+        "poids": 3
+    },
+    "7435": {
+        "name": "Rune Do",
+        "poids": 20
+    },
+    "11659": {
+        "name": "Rune Do Feu",
+        "poids": 5
+    },
+    "19339": {
+        "name": "Rune Pa Ré Eau",
+        "poids": 6
+    },
+    "1548": {
+        "name": "Rune Pa Vi",
+        "poids": 3
+    },
+    "7436": {
+        "name": "Rune Pui",
+        "poids": 2
+    },
+    "11660": {
+        "name": "Rune Pa Do Feu",
+        "poids": 15
+    },
+    "1549": {
+        "name": "Rune Pa Age",
+        "poids": 3
+    },
+    "7437": {
+        "name": "Rune Do Ren",
+        "poids": 10
+    },
+    "11661": {
+        "name": "Rune Do Eau",
+        "poids": 5
+    },
+    "19341": {
+        "name": "Rune Pa Ré Neutre",
+        "poids": 6
+    },
+    "1550": {
+        "name": "Rune Pa Cha",
+        "poids": 3
+    },
+    "7438": {
+        "name": "Rune Po",
+        "poids": 51
+    },
+    "11662": {
+        "name": "Rune Pa Do Eau",
+        "poids": 15
+    },
+    "19342": {
+        "name": "Rune Pa Ré Terre",
+        "poids": 6
+    },
+    "1551": {
+        "name": "Rune Ra Fo",
+        "poids": 10
+    },
+    "11663": {
+        "name": "Rune Do Air",
+        "poids": 5
+    },
+    "1552": {
+        "name": "Rune Ra Sa",
+        "poids": 9
+    },
+    "11664": {
+        "name": "Rune Pa Do Air",
+        "poids": 15
+    },
+    "1553": {
+        "name": "Rune Ra Ine",
+        "poids": 10
+    },
+    "11665": {
+        "name": "Rune Do Neutre",
+        "poids": 5
+    },
+    "1554": {
+        "name": "Rune Ra Vi",
+        "poids": 10
+    },
+    "7442": {
+        "name": "Rune Invo",
+        "poids": 30
+    },
+    "11666": {
+        "name": "Rune Pa Do Neutre",
+        "poids": 15
+    },
+    "1555": {
+        "name": "Rune Ra Age",
+        "poids": 10
+    },
+    "7443": {
+        "name": "Rune Pod",
+        "poids": 2.5
+    },
+    "1556": {
+        "name": "Rune Ra Cha",
+        "poids": 10
+    },
+    "7444": {
+        "name": "Rune Pa Pod",
+        "poids": 7.5
+    },
+    "1557": {
+        "name": "Rune Ga Pa",
+        "poids": 100
+    },
+    "7445": {
+        "name": "Rune Ra Pod",
+        "poids": 25
+    },
+    "1558": {
+        "name": "Rune Ga Pme",
+        "poids": 90
+    },
+    "7446": {
+        "name": "Rune Pi",
+        "poids": 5
+    },
+    "7447": {
+        "name": "Rune Pi Per",
+        "poids": 2
+    },
+    "7448": {
+        "name": "Rune Ini",
+        "poids": 1
+    },
+    "7449": {
+        "name": "Rune Pa Ini",
+        "poids": 3
+    },
+    "7450": {
+        "name": "Rune Ra Ini",
+        "poids": 10
+    },
+    "7451": {
+        "name": "Rune Prospe",
+        "poids": 3
+    },
+    "7452": {
+        "name": "Rune Ré Feu",
+        "poids": 2
+    },
+    "7453": {
+        "name": "Rune Ré Air",
+        "poids": 2
+    },
+    "7454": {
+        "name": "Rune Ré Eau",
+        "poids": 2
+    },
+    "7455": {
+        "name": "Rune Ré Terre",
+        "poids": 2
+    },
+    "18719": {
+        "name": "Rune Do Per Mé",
+        "poids": 15
+    },
+    "7456": {
+        "name": "Rune Ré Neutre",
+        "poids": 2
+    },
+    "18720": {
+        "name": "Rune Do Per Di",
+        "poids": 15
+    },
+    "18721": {
+        "name": "Rune Do Per Ar",
+        "poids": 15
+    },
+    "7457": {
+        "name": "Rune Ré Per Feu",
+        "poids": 6
+    },
+    "7458": {
+        "name": "Rune Ré Per Air",
+        "poids": 6
+    },
+    "18722": {
+        "name": "Rune Do Per So",
+        "poids": 15
+    },
+    "7459": {
+        "name": "Rune Ré Per Terre",
+        "poids": 6
+    },
+    "18723": {
+        "name": "Rune Ré Per Mé",
+        "poids": 15
+    },
+    "7460": {
+        "name": "Rune Ré Per Neutre",
+        "poids": 6
+    },
+    "18724": {
+        "name": "Rune Ré Per Di",
+        "poids": 15
+    },
+    "10662": {
+        "name": "Rune Pa Prospe",
+        "poids": 20
+    },
+    "10057": {
+        "name": "Rune de chasse",
+        "poids": 5
+    },
+    "7508": {
+        "name": "Rune de Signature",
+        "poids": 0
+    },
+    "1519": {
+        "name": "Rune Fo",
+        "poids": 1
+    },
+    "1521": {
+        "name": "Rune Sa",
+        "poids": 3
+    },
+    "1522": {
+        "name": "Rune Ine",
+        "poids": 1
+    },
+    "1523": {
+        "name": "Rune Vi",
+        "poids": 1
+    },
+    "1524": {
+        "name": "Rune Age",
+        "poids": 1
+    },
+    "1525": {
+        "name": "Rune Cha",
+        "poids": 1
+    },
+    "10613": {
+        "name": "Rune Pa Pi",
+        "poids": 15
+    },
+    "11637": {
+        "name": "Rune Fui",
+        "poids": 4
+    },
+    "11638": {
+        "name": "Rune Pa Fui",
+        "poids": 12
+    },
+    "10615": {
+        "name": "Rune Pa Pi Per",
+        "poids": 6
+    },
+    "11639": {
+        "name": "Rune Tac",
+        "poids": 4
+    },
+    "10616": {
+        "name": "Rune Ra Pi Per",
+        "poids": 20
+    },
+    "11640": {
+        "name": "Rune Pa Tac",
+        "poids": 12
+    },
+    "11641": {
+        "name": "Rune Ré Pa",
+        "poids": 7
+    },
+    "10618": {
+        "name": "Rune Pa Pui",
+        "poids": 6
+    },
+    "11642": {
+        "name": "Rune Pa Ré Pa",
+        "poids": 21
+    },
+    "10619": {
+        "name": "Rune Ra Pui",
+        "poids": 6
+    },
+    "11643": {
+        "name": "Rune Ré Pme",
+        "poids": 7
+    },
+    "11644": {
+        "name": "Rune Pa Ré Pme",
+        "poids": 21
+    },
+    "11645": {
+        "name": "Rune Ret Pa",
+        "poids": 7
+    },
+    "11646": {
+        "name": "Rune Pa Ret Pa",
+        "poids": 21
+    },
+    "11647": {
+        "name": "Rune Ret Pme",
+        "poids": 7
+    }
+}

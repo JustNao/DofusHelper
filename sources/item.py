@@ -10,6 +10,10 @@ with open('sources\\gameRessources\\Recipes.json', encoding='utf-8') as f:
 with open('sources\\gameRessources\\prices.json', encoding='utf-8') as f:
     prices = json.load(f)
 
+with open('sources\\gameRessources\\runes.json', encoding='utf-8') as f:
+    runes = json.load(f)
+
+
 itemToName = {}
 for key in gameItems:
     try:
