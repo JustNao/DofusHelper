@@ -3,6 +3,13 @@
 Tous les scripts utilisent des IDs de packet qui sont très souvent changés par Ankama. Ils nécessitent donc une mise à jour manuelle pour fonctionner.
 Je ne joue pas régulièrement donc les IDs sont rarement exactes; je laisse quand même les scripts pour ceux que ça intéresse, si vous tombez sur un bon moment et j'ai mis à jour récemment, ou si vous voulez vous-même mettre à jour les IDs (les scripts que j'utilise pour le faire sont ceux de LaBot, lien tout en bas).
 
+My process for extracting packet IDs (every script used is from [Labot](https://github.com/louisabraham/LaBot)) :
+
+1. Decompile the DofusInvoker.swf using [decompile.sh](https://github.com/louisabraham/LaBot/blob/master/scripts/decompile.sh) (I've come to use the .sh even on windows using bash, as the .bat didn't work properly for me). You may need to modify the Dofus folder and/or the location of the ffdec depending on the OS. On Windows, don't forget to put the path to ffdec.exe in double quotes.
+This will decompile every packet file into the sources folder
+2. Build the protocol.pk using [build_protocol.py](https://github.com/louisabraham/LaBot/blob/master/scripts/build_protocol.py)
+3. Replace the old protocol.pk with the new protocol.pk that was created in the labot folder
+
 # Dofus Help Manager
 
 Repo pour diffuser le bot (projet perso).
