@@ -5,10 +5,9 @@ Je ne joue pas régulièrement donc les IDs sont rarement exactes; je laisse qua
 
 My process for extracting packet IDs (every script used is from [Labot](https://github.com/louisabraham/LaBot)) :
 
-1. Decompile the DofusInvoker.swf using [decompile.sh](https://github.com/louisabraham/LaBot/blob/master/scripts/decompile.sh) (I've come to use the .sh even on windows using bash, as the .bat didn't work properly for me). You may need to modify the Dofus folder and/or the location of the ffdec depending on the OS. On Windows, don't forget to put the path to ffdec.exe in double quotes.
-This will decompile every packet file into the sources folder
-2. Build the protocol.pk using [build_protocol.py](https://github.com/louisabraham/LaBot/blob/master/scripts/build_protocol.py)
-3. Replace the old protocol.pk with the new protocol.pk that was created in the labot folder
+1. Decompile the DofusInvoker.swf using scripts/decompile.sh. You may need to modify the Dofus folder and/or the location of the ffdec depending on the OS. On Windows, don't forget to put the path to ffdec.exe in double quotes.
+This will decompile every packet file into the protocol folder
+2. Build the protocol.pk using scripts/built_protocol.py
 
 # Dofus Help Manager
 
