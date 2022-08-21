@@ -10,3 +10,5 @@ pywinauto
 openpyxl
 gspread
 oauth2client
+seleniumwire
+selenium

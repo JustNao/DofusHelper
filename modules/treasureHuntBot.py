@@ -1,28 +1,40 @@
-print('Importing sources ...')
-from PIL.ImageOps import grayscale
-from sniffer import protocol
-import requests
-import time
-import os, sys
-from colorama import init, Fore, Style
-from sources.id import mapIdToCoords, textId, poiToName, npcToName, monsterToName, archiNameList
-import ui.gui as g
-import pyautogui as ag
-from random import random
+import json
+import sys
+import os
 import math
-print('Sources imported !')
+from random import random
+import pyautogui as ag
+import ui.gui as g
+from sources.id import mapIdToCoords, textId, poiToName, npcToName, monsterToName, archiNameList
+from colorama import init, Fore, Style
+import time
+import requests
+from sniffer import protocol
+from PIL.ImageOps import grayscale
+from seleniumwire import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from seleniumwire.utils import decode
 
 init()  # Don't touch, used for colors in terminal
+
 
 class TreasureHuntHelper():
 
     def __init__(self, bot=False) -> None:
-        # dict.loadIds()
         global DEBUG
         DEBUG = False
         print("Treasure helper initialized")
+
+        # Running selenium webdriver in the background to simulate the user's clicks on the site
+        options = Options()
+        options.add_argument('--headless')
+        options.add_argument("log-level=1")
+        self.driver = webdriver.Chrome(chrome_options=options)
+        self.driver.get("https://dofusdb.fr/fr/tools/treasure-hunt")
+
         self.botting = bot
-        
         self.playerPos = self.Position()
         self.hintPos = self.Hint()
         self.timeStart = None
@@ -38,7 +50,7 @@ class TreasureHuntHelper():
             self.initBotting()
         if getattr(sys, 'frozen', False):
             # If the application is run as a bundle, the PyInstaller bootloader
-            # extends the sys module by a flag frozen=True and sets the app 
+            # extends the sys module by a flag frozen=True and sets the app
             # path into variable _MEIPASS'.
             self.application_path = sys._MEIPASS
         else:
@@ -133,7 +145,7 @@ class TreasureHuntHelper():
             # 9053, GameFightStartingMessage
             # En entrant en combat, on met en pause le sniffer pour éviter les problèmes
             g.ui.load()
-            
+
         if DEBUG:
             print(msg.id + ", " + name)
 
@@ -152,8 +164,8 @@ class TreasureHuntHelper():
 
                 if DEBUG:
                     print("Horizontal distance from hint : ", Fore.GREEN +
-                      str(self.hintPos.distance) + Fore.RESET)
-                
+                          str(self.hintPos.distance) + Fore.RESET)
+
                 g.ui.changeImg(str(int(self.hintPos.distance)))
 
                 if self.playerPos.x < self.hintPos.x:
@@ -166,10 +178,10 @@ class TreasureHuntHelper():
 
             elif self.playerPos.y != self.hintPos.y:
                 self.hintPos.distance = abs(self.playerPos.y - self.hintPos.y)
-                
+
                 if DEBUG:
                     print("Vertical distance from hint : ", Fore.GREEN +
-                      str(self.hintPos.distance) + Fore.RESET)
+                          str(self.hintPos.distance) + Fore.RESET)
 
                 g.ui.changeImg(str(int(self.hintPos.distance)))
 
@@ -194,6 +206,75 @@ class TreasureHuntHelper():
         self.hintPos.distance = 666
         self.direction = "stay"
         self.phorreur['lookingFor'] = False
+
+    def getDofusDBPos(self, hintBody, poiToLookFor):
+        hintBody["data"].sort(key=lambda x: x["distance"])
+        for pos in hintBody["data"]:
+            for poi in pos["pois"]:
+                if poi["name"]["fr"] == poiToLookFor:
+                    print(pos["posX"], pos["posY"])
+                    return pos["posX"], pos["posY"], pos["distance"]
+        return 666, 666, 666
+
+    def getDofusDBRequest(self, posX, posY, direction, poiToLookFor):
+        remotePosX = self.driver.find_element(
+            By.XPATH, "//input[@placeholder='X']")
+        remotePosX.click()
+        remotePosX.send_keys(Keys.CONTROL, 'a')
+        remotePosX.send_keys(posX)
+        remotePosY = self.driver.find_element(
+            By.XPATH, "//input[@placeholder='Y']")
+        remotePosY.click()
+        remotePosY.send_keys(Keys.CONTROL, 'a')
+        remotePosY.send_keys(posY)
+        direction = self.driver.find_element(
+            By.XPATH, f"//i[contains(@class, 'fa-arrow-{direction}')]")
+        direction.click()
+
+        hintRequest = self.driver.wait_for_request(
+            "https://api.dofusdb.fr/treasure-hunt")
+        response = hintRequest.response
+        body = decode(response.body, response.headers.get(
+            'Content-Encoding', 'identity'))
+        hintBody = json.loads(body.decode('utf-8'))
+        del self.driver.requests
+        return self.getDofusDBPos(hintBody, poiToLookFor)
+
+    def getHint(self, packet, clientHintName):
+        directionForDofusDB = {
+            "right": "right",
+            "bottom": "down",
+            "left": "left",
+            "top": "up",
+        }
+
+        if (len(packet['flags']) == 0):
+            lastCheckPoint = packet['startMapId']
+        else:
+            lastCheckPoint = packet['flags'][-1]['mapId']
+
+        posX = str(mapIdToCoords[lastCheckPoint][0])
+        posY = str(
+            mapIdToCoords[lastCheckPoint][1])
+        direction = directionForDofusDB[self.direction]
+
+        newPosX, newPosY, distance = self.getDofusDBRequest(
+            posX, posY, direction, clientHintName)
+        self.hintPos = self.Hint(newPosX, newPosY, distance)
+
+        # TODO: use dofus-map as a backup, even if it's outdated
+        # url = 'https://dofus-map.com/huntTool/getData.php?x=' + posX + '&y=' + \
+        #     posY + '&direction=' + self.direction + '&world=0&language=fr'
+        # get = requests.get(url)
+        # js = get.json()
+
+        # for hint in js['hints']:
+        #     dofusMapName = textId[str(hint['n'])]
+        #     if clientHintName == dofusMapName:
+        #         if (hint['d'] < self.hintPos.distance) and ((hint['x'], hint['y']) not in self.checkPositions):
+        #             self.hintPos = self.Hint(
+        #                 hint['x'], hint['y'], hint['d'])
+        #             break
 
     def mapContentAnalyse(self, packet):
         for actor in packet["actors"]:
@@ -220,12 +301,11 @@ class TreasureHuntHelper():
                     self.direction = "stay"
                     break
 
-
         self.move()
 
     def huntNewStep(self, packet):
         self.reset()
-        starting = False
+
         if len(packet['flags']) == 0:
             self.checkPositions.clear()
             self.checkPositions.append(
@@ -235,9 +315,7 @@ class TreasureHuntHelper():
                 self.timeStart = time.time()
                 self.playerPos = self.Position(-25, -36)  # Malle aux trésors
                 g.ui.changeDirection()
-                starting = True
-                # ag.click(ag.locateCenterOnScreen(os.path.dirname(os.path.realpath(
-                    # '__file__')) + '\\sources\\img\\pixel\\sideBlack.png', grayscale = True, confidence = 0.75))
+
         elif len(packet['flags']) == packet['totalStepCount']:
             g.ui.changeImg("checkpoint")
             print(Fore.YELLOW + "Checkpoint reached !" + Fore.RESET)
@@ -264,31 +342,14 @@ class TreasureHuntHelper():
             strDirection = 'left'
         else:
             strDirection = 'top'
-        
-        if not starting:
-            self.direction = strDirection
+
+        self.direction = strDirection
 
         if packet['knownStepsList'][-1]['__type__'] == 'TreasureHuntStepFollowDirectionToPOI':
-            # Using Dofus-Map API to get hints based on position and direction
-            if (len(packet['flags']) == 0):
-                lastCheckPoint = packet['startMapId']
-            else:
-                lastCheckPoint = packet['flags'][-1]['mapId']
-
-            url = 'https://dofus-map.com/huntTool/getData.php?x=' + str(mapIdToCoords[lastCheckPoint][0]) + '&y=' + str(
-                mapIdToCoords[lastCheckPoint][1]) + '&direction=' + strDirection + '&world=0&language=fr'
-            get = requests.get(url)
-            js = get.json()
 
             clientHintName = poiToName(
                 packet['knownStepsList'][-1]['poiLabelId'])
-
-            for hint in js['hints']:
-                dofusMapName = textId[str(hint['n'])]
-                if clientHintName == dofusMapName:
-                    if (hint['d'] < self.hintPos.distance) and ((hint['x'], hint['y']) not in self.checkPositions):
-                        self.hintPos = self.Hint(
-                            hint['x'], hint['y'], hint['d'])
+            self.getHint(packet, clientHintName)
 
             if self.hintPos.distance == 666:
                 print(Fore.RED + "ERROR : no hint found !" + Fore.RESET)
