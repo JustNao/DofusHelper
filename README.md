@@ -6,7 +6,7 @@ Je ne joue pas régulièrement donc les IDs sont rarement exactes; je laisse qua
 My process for extracting packet IDs (every script used is from [Labot](https://github.com/louisabraham/LaBot)) :
 
 1. Decompile the DofusInvoker.swf using scripts/decompile.sh. You may need to modify the Dofus folder and/or the location of the ffdec depending on the OS. On Windows, don't forget to put the path to ffdec.exe in double quotes.
-This will decompile every packet file into the protocol folder
+   This will decompile every packet file into the protocol folder
 2. Build the protocol.pk using scripts/built_protocol.py
 
 # Dofus Help Manager
@@ -17,10 +17,12 @@ Repo pour diffuser le bot (projet perso).
 
 1. Installer [Python 3](https://www.python.org/downloads/)
 2. Ajouter PIP (installé avec les dernières versions de Python) [à votre Path](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/). Si vous n'avez rien touché à l'installation de python, le dossier à ajouter devrait être
-'C:\Program Files\Python39\Scripts'.
-2. Installer [Npcap](https://nmap.org/dist) <= 1.60
-2. Exporter le git (bash, zip, ...)
-3. Lancer setup.bat
+   'C:\Program Files\Python39\Scripts'.
+3. Installer [Npcap](https://nmap.org/dist) <= 1.60
+4. Télécharger le [Chromedriver](https://chromedriver.chromium.org/downloads) qui correspond à votre version de Chrome
+5. Ajouter ce Chromedriver à votre PATH
+6. Exporter le git (bash, zip, ...)
+7. Lancer setup.bat
 
 ## Utilisation
 
@@ -31,10 +33,12 @@ Soit ouvrir le fichier launch.bat (sous Windows), soit l'ouvrir dans une invite 
 ```bash
 py main.py
 ```
+
 Une fois lancé, vous aurez accès une liste d'outils.
+
 ### Treasure Hunt Helper
 
-Localise les indices de chasse au trésor. Une mini fenêtre s'ouvre pour afficher la position, la distance avec la joueur et la direction (style GPS). Détection de phorreur et d'archimonstre intégrée. Cliquer sur l'icône de drapeau, loupe ou combat clique directement sur le bouton respectif dans la fenêtre de chasse au trésor (si celle ci est ouverte).
+Localise les indices de chasse au trésor. Une mini fenêtre s'ouvre pour afficher la position, la distance avec la joueur et la direction (style GPS). Détection de phorreur et d'archimonstre intégrée. Cliquer sur l'icône de drapeau, loupe ou combat clique directement sur le bouton respectif dans la fenêtre de chasse au trésor (si celle ci est ouverte). 
 
 ### Treasure Hunt Bot
 
@@ -80,8 +84,9 @@ Liste le prix de tous les items en hdv ressource. Extrêmement lent (+ de 3 heur
 Dans n'importe quel module, quand le bot pixel est utilisé, placer la souris dans le coin supérieur gauche de l'écran stoppera le bot (il faudra relancer l'application pour relancer le bot).
 
 ## Copyright
+
 Merci à [LaBot](https://github.com/louisabraham/LaBot) pour son reader/writer de packet.
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
 
+[MIT](https://choosealicense.com/licenses/mit/)
