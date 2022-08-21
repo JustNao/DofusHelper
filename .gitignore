@@ -2,7 +2,7 @@ all_widgets.py
 main.spec
 nomansland.py
 safekeep.json
-__pycache__/*
+__pycache__
 sources/Ids
 packetInfo.txt
 .vscode/*
