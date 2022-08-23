@@ -18,7 +18,7 @@ Repo pour diffuser le bot (projet perso).
 1. Installer [Python 3](https://www.python.org/downloads/)
 2. Ajouter PIP (installé avec les dernières versions de Python) [à votre Path](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/). Si vous n'avez rien touché à l'installation de python, le dossier à ajouter devrait être
    'C:\Program Files\Python39\Scripts'.
-3. Installer [Npcap](https://nmap.org/dist) <= 1.60
+3. Installer [Npcap](https://nmap.org/dist) <= [1.60](https://npcap.com/dist/npcap-1.60.exe)
 4. Télécharger le [Chromedriver](https://chromedriver.chromium.org/downloads) qui correspond à votre version de Chrome
 5. Ajouter ce Chromedriver à votre PATH
 6. Exporter le git (bash, zip, ...)
