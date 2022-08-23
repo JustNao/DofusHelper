@@ -12,3 +12,4 @@ gspread
 oauth2client
 selenium-wire
 selenium
+playsound
