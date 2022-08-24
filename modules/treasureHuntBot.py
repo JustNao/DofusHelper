@@ -95,7 +95,12 @@ class TreasureHuntHelper():
 
     def move(self):
         # Déplacement du bot
+
         if (not self.botting) or (self.hintPos.distance > 10 and not self.phorreur['lookingFor']):
+            return
+
+        # For first step, the hint will likely be away
+        if abs(self.playerPos.x - self.hintPos.x) < 10 and abs(self.playerPos.y - self.hintPos.y) < 10:
             return
 
         currentMousePos = ag.position()
