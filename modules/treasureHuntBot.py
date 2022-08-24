@@ -100,7 +100,7 @@ class TreasureHuntHelper():
             return
 
         # For first step, the hint will likely be away
-        if abs(self.playerPos.x - self.hintPos.x) < 10 and abs(self.playerPos.y - self.hintPos.y) < 10:
+        if abs(self.playerPos.x - self.hintPos.x) > 10 or abs(self.playerPos.y - self.hintPos.y) > 10:
             return
 
         currentMousePos = ag.position()
