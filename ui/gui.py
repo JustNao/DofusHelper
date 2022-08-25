@@ -451,7 +451,7 @@ class GraphicalInterface():
             elif event == 'FILTER':
                 searcher.filterBids(values)
             elif event in ('PA', 'PM', 'PO'):
-                self._moduleWindow[f"HIDDEN-{event}"].update('')
+                self._moduleWindow[f"HIDDEN-{event}"].update(exoId[event])
                 self._moduleWindow[f"ROW-EXO-{event}"].update(visible=True)
                 for hide in list(set(('PA', 'PM', 'PO')) - set([event])):
                     self._moduleWindow[f"HIDDEN-{hide}"].update('')

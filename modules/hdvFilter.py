@@ -30,6 +30,19 @@ class HDVFilter:
         keyboard.on_press_key('right', self.nextBid)
         keyboard.on_press_key('left', self.previousBid)
 
+    def fullEffect(self, effectId):
+        fullEffect = idToEffect[effectId]['description']
+        displayEffectRaw = re.split(r'[ {}~%#]', fullEffect)
+        displayEffect = []
+        for split in displayEffectRaw:
+            if len(split) > 2 or split in ('PA', 'PM'):
+                displayEffect.append(split)
+        if '%' in fullEffect:
+            displayEffect.append('(%)')
+        elif 'Résistance' in fullEffect:
+            displayEffect.append('(Fixe)')
+        return ' '.join(map(str, displayEffect))
+
     def reset(self):
         self.item = None
         self.bids = []
@@ -77,17 +90,42 @@ class HDVFilter:
                             f"  {bidEffect['min']} à {bidEffect['min']} {effect['type']}")
                     break
             if not found:
-                print(f"{Fore.LIGHTBLACK_EX} 0 {effect['type']}{Fore.RESET} [{effect['min']} à {effect['max']}]")
-        pass
+                print(
+                    f"{Fore.LIGHTBLACK_EX} 0 {effect['type']}{Fore.RESET} [{effect['min']} à {effect['max']}]")
+
+        # EXO
+        for bidEffect in bid['effects']:
+            found = False
+
+            if bidEffect['actionId'] in (985, 988, 1151, 1176):
+                # Item modifié par XX
+                # Item fabriqué par XX
+                # Apparence modifiée
+                # Apparence modifiée²
+                continue
+
+            for effectId, effect in self.item['effects'].items():
+                if bidEffect['actionId'] == effectId:
+                    found = True
+                    break
+            if not found and bidEffect['value'] > 0:
+                print(
+                    f"{Fore.MAGENTA} +{bidEffect['value']} {self.fullEffect(bidEffect['actionId'])}{Fore.RESET}")
 
     def filterBids(self, filt):
         self.releventBids = []
 
         characFilter = {}
-        for i in range(int(len(filt.keys())/2)):
+        for i in range(20):
             if filt[f'I-{i}'] != '':
                 characFilter[int(filt[f'HIDDEN-{i}'])] = {
                     'value': int(filt[f'I-{i}']),
+                    'diff': 0,
+                }
+        for exo in ('PA', 'PM', 'PO'):
+            if filt[f'HIDDEN-{exo}'] != '':
+                characFilter[int(filt[f'HIDDEN-{exo}'])] = {
+                    'value': 1,
                     'diff': 0,
                 }
 
@@ -128,22 +166,11 @@ class HDVFilter:
             self.item['effects'] = {}
             for effect in self.item['possibleEffects']:
 
-                fullEffect = idToEffect[effect['effectId']]['description']
-                displayEffectRaw = re.split(r'[ {}~%#]', fullEffect)
-                displayEffect = []
-                for split in displayEffectRaw:
-                    if len(split) > 2 or split in ('PA', 'PM'):
-                        displayEffect.append(split)
-                if '%' in fullEffect:
-                    displayEffect.append('(%)')
-                elif 'Résistance' in fullEffect:
-                    displayEffect.append('(Fixe)')
-
                 operator = effects(effect['effectId'])['operator']
                 self.item['effects'][effect['effectId']] = {
                     'min': effect['diceNum'],
                     'max': effect['diceSide'],
-                    'type': ' '.join(map(str, displayEffect)),
+                    'type': self.fullEffect(effect['effectId']),
                     'operator': operator,
                 }
 
