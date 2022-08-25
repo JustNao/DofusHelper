@@ -7,7 +7,6 @@ sources/Ids
 packetInfo.txt
 .vscode/*
 uiTest.py
-sources/gameRessources/Items.json
 *xlsx
 access*
 itemAveragePrices.dat

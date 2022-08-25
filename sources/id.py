@@ -25,19 +25,25 @@ for poi in poiJs:
 
 def poiToName(id):
     nameId = [obj for obj in poiJs if obj['id']==id][0]['nameId']
-    name = i18n['texts'][str(nameId)]
+    try:
+        name = i18n['texts'][str(nameId)]
+    except KeyError:
+        return "Unknown"
     return name
 
 def npcToName(id):
     nameId = [obj for obj in npcJs if obj['id']==id][0]['nameId']
-    name = i18n['texts'][str(nameId)]
-    return name    
+    try:
+        name = i18n['texts'][str(nameId)]
+    except KeyError:
+        return "Unknown"
+    return name
 
 def monsterToName(id):
     try:
         nameId = [obj for obj in monsterJs if obj['id']==id][0]['nameId']
         name = i18n['texts'][str(nameId)]
         return name
-    except IndexError:
+    except KeyError:
         print("Couldn't identify", id)
         return ''

@@ -2,7 +2,8 @@ from tkinter import TclError
 from tkinter.constants import CENTER, DISABLED, RIGHT, LEFT
 from sniffer.network import flushBuffers
 import PySimpleGUI as sg
-import os, sys
+import os
+import sys
 import threading
 import pyautogui as ag
 from colorama import Fore
@@ -29,8 +30,8 @@ class GraphicalInterface():
                                                   'PROGRESS_DEPTH': 0}
 
         sg.LOOK_AND_FEEL_TABLE['HDV'] = {'BACKGROUND': '#2c2e25',
-                                                  'TEXT': '#a3a3a3',
-                                                  'INPUT': '#676866',
+                                         'TEXT': '#a3a3a3',
+                                         'INPUT': '#676866',
                                                   'SCROLL': '#E3E3E3',
                                                   'TEXT_INPUT': '#eec606',
                                                   'BUTTON': ('black', '#bcd800'),
@@ -40,8 +41,8 @@ class GraphicalInterface():
                                                   'PROGRESS_DEPTH': 0}
         sg.set_options(suppress_raise_key_errors=True)
         sg.theme('HDV')
-    
-    def initilisation(self, action, pause = 0):
+
+    def initilisation(self, action, pause=0):
         ag.PAUSE = pause
         self.packetRead = action
         self.load()
@@ -52,24 +53,26 @@ class GraphicalInterface():
             self.stopSniff = self.startSniff(self.packetRead)
             print(Fore.GREEN + "Module started !" + Fore.RESET)
             try:
-                self._moduleWindow['ON/OFF'].update(image_filename=imgList['on'])
+                self._moduleWindow['ON/OFF'].update(
+                    image_filename=imgList['on'])
             except:
                 pass
         else:
-            self.stop(toggle = True) 
+            self.stop(toggle=True)
 
-    def stop(self, toggle = False):
+    def stop(self, toggle=False):
         if self.stopSniff is not None:
             self.stopSniff()
             self.stopSniff = None
             print(Fore.YELLOW + "Module stopped" + Fore.RESET)
             try:
                 if toggle:
-                    self._moduleWindow['ON/OFF'].update(image_filename=imgList['off'])
+                    self._moduleWindow['ON/OFF'].update(
+                        image_filename=imgList['off'])
             except TclError:
                 pass
-            
-    def startUi(self): 
+
+    def startUi(self):
         t = threading.Thread(target=self.buildUi, name="GUI")
         t.start()
 
@@ -86,13 +89,11 @@ class GraphicalInterface():
 
         if getattr(sys, 'frozen', False):
             # If the application is run as a bundle, the PyInstaller bootloader
-            # extends the sys module by a flag frozen=True and sets the app 
+            # extends the sys module by a flag frozen=True and sets the app
             # path into variable _MEIPASS'.
             application_path = sys._MEIPASS
         else:
             application_path = os.path.dirname(os.path.abspath(__file__))
-
-        
 
         imgFolder = application_path + '\\..\\sources\\img\\GUI'
 
@@ -100,38 +101,42 @@ class GraphicalInterface():
                    f for f in os.listdir(imgFolder) if '.png' in f}
 
         firstColumn = [
-                    [sg.Radio("Treasure Hunt Bot", default = True, group_id = "CHOICE", key = 'huntBot')],
-                    [sg.Radio("Treasure Hunt Helper", group_id = "CHOICE", key = 'huntHelper')],
-                    [sg.Radio("HDV Items Listing", group_id = "CHOICE", key = 'hdv')],
-                    [sg.Radio("HDV Missing Items", group_id = "CHOICE", key = 'hdvMissing')],
-                    [sg.Radio("No man's land", group_id = "CHOICE", key = 'nomansland')]
-        ]
-        
-        secondColumn = [
-                    [sg.Radio("Chat Searcher", group_id = "CHOICE", key = 'chat')],
-                    [sg.Radio("Multicompte Tool", group_id = "CHOICE", key = 'multi')],
-                    [sg.Radio("AvA Counter", group_id = "CHOICE", key = 'ava')],
-                    [sg.Radio("Ressources Price Listing", group_id = "CHOICE", key = 'priceListing')],
-                    [sg.Radio("Price Computer", group_id = "CHOICE", key = 'priceCompute')]
+            [sg.Radio("Treasure Hunt Bot", default=True,
+                      group_id="CHOICE", key='huntBot')],
+            [sg.Radio("Treasure Hunt Helper",
+                      group_id="CHOICE", key='huntHelper')],
+            [sg.Radio("HDV Items Listing", group_id="CHOICE", key='hdv')],
+            [sg.Radio("HDV Missing Items", group_id="CHOICE", key='hdvMissing')],
+            [sg.Radio("No man's land", group_id="CHOICE", key='nomansland')]
         ]
 
-        menuLayout =[
-                    [sg.Column(firstColumn),
-                    sg.Column(secondColumn)],
-                    [sg.Button("Launch", key = "LAUNCH", use_ttk_buttons = True)]
-            ]
+        secondColumn = [
+            [sg.Radio("Chat Searcher", group_id="CHOICE", key='chat')],
+            [sg.Radio("HDV Filter", group_id="CHOICE", key='hdvFilter')],
+            [sg.Radio("Multicompte Tool", group_id="CHOICE", key='multi')],
+            [sg.Radio("AvA Counter", group_id="CHOICE", key='ava')],
+            [sg.Radio("Ressources Price Listing",
+                      group_id="CHOICE", key='priceListing')],
+            [sg.Radio("Price Computer", group_id="CHOICE", key='priceCompute')]
+        ]
+
+        menuLayout = [
+            [sg.Column(firstColumn),
+             sg.Column(secondColumn)],
+            [sg.Button("Launch", key="LAUNCH", use_ttk_buttons=True)]
+        ]
 
         menuWindow = sg.Window(
-            title = "DHM",
-            layout = menuLayout,
-            margins = (20, 5),
+            title="DHM",
+            layout=menuLayout,
+            margins=(20, 5),
             border_depth=3,
             keep_on_top=False,
             finalize=True,
-            element_justification= 'center',
-            icon = application_path + '\\..\\sources\\img\\icon\\phoenix.ico',
-            use_default_focus = False
-            )
+            element_justification='center',
+            icon=application_path + '\\..\\sources\\img\\icon\\phoenix.ico',
+            use_default_focus=False
+        )
 
         while True:
             event, values = menuWindow.read()
@@ -166,6 +171,8 @@ class GraphicalInterface():
                 self.startPriceComputerUi()
             elif (self.userChoice == 'nomansland'):
                 self.startNomansland()
+            elif (self.userChoice == 'hdvFilter'):
+                self.startHDVFilter()
         except AttributeError:
             return
 
@@ -201,7 +208,7 @@ class GraphicalInterface():
             keep_on_top=True,
             finalize=True,
             alpha_channel=.85,
-            element_justification = CENTER)
+            element_justification=CENTER)
 
         while True:
             event, values = self._moduleWindow.read(timeout=15000)
@@ -211,7 +218,7 @@ class GraphicalInterface():
             elif event == "ON/OFF":
                 self.load()
             elif (event == sg.WIN_CLOSED) or (event == "EXIT"):
-                self.stop(toggle = True)
+                self.stop(toggle=True)
                 break
             self._moduleWindow.refresh()
 
@@ -224,25 +231,26 @@ class GraphicalInterface():
         # self.initilisation(packetRead, 0.3)
 
         layout = [
-            [sg.Text("Waiting for a tab click", key = "INFO", size = (30, 1))],
-            [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25','#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
+            [sg.Text("Waiting for a tab click", key="INFO", size=(30, 1))],
+            [sg.Button(image_filename=imgList['off'], button_color=(
+                '#2c2e25', '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
         ]
         sg.theme('HDV')
         self._moduleWindow = sg.Window(
-            'Données ventes', 
-            layout, 
-            resizable = True, 
-            element_justification = 'center', 
-            grab_anywhere = True,
+            'Données ventes',
+            layout,
+            resizable=True,
+            element_justification='center',
+            grab_anywhere=True,
             size=(290, 75),
             keep_on_top=True,
-            )
+        )
 
         loaded = False
         while True:
             event, values = self._moduleWindow.read()
             if event == sg.WIN_CLOSED:
-                self.stop(toggle = True)
+                self.stop(toggle=True)
                 break
             elif event == "ON/OFF":
                 if not loaded:
@@ -258,25 +266,26 @@ class GraphicalInterface():
         packetRead = PriceListing().packetRead
 
         layout = [
-            [sg.Text("Item index", key = "INFO", auto_size_text="true")],
-            [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25','#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
+            [sg.Text("Item index", key="INFO", auto_size_text="true")],
+            [sg.Button(image_filename=imgList['off'], button_color=(
+                '#2c2e25', '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
         ]
 
         sg.theme('HDV')
         self._moduleWindow = sg.Window(
-            'Ressources Price Listing', 
-            layout, 
-            resizable = True, 
-            element_justification = 'center', 
-            grab_anywhere = True,
+            'Ressources Price Listing',
+            layout,
+            resizable=True,
+            element_justification='center',
+            grab_anywhere=True,
             keep_on_top=True,
-            )
+        )
 
         loaded = False
         while True:
             event, values = self._moduleWindow.read()
             if event == sg.WIN_CLOSED:
-                self.stop(toggle = True)
+                self.stop(toggle=True)
                 break
             elif event == "ON/OFF":
                 if not loaded:
@@ -293,45 +302,48 @@ class GraphicalInterface():
         self.initilisation(packetRead, 0.3)
 
         layout = [
-            [sg.Text("Item Price", key = "INFO", size = (15, 1), text_color = "#ffea00", font = ('Helvetica', 30))],
-            [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25','#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0), visible= False)]
+            [sg.Text("Item Price", key="INFO", size=(15, 1),
+                     text_color="#ffea00", font=('Helvetica', 30))],
+            [sg.Button(image_filename=imgList['off'], button_color=(
+                '#2c2e25', '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0), visible=False)]
         ]
 
         sg.theme('HDV')
         self._moduleWindow = sg.Window(
-            'Ressources Price Listing', 
-            layout, 
+            'Ressources Price Listing',
+            layout,
             no_titlebar=True,
-            resizable = True, 
-            element_justification = 'center', 
-            grab_anywhere = True,
+            resizable=True,
+            element_justification='center',
+            grab_anywhere=True,
             keep_on_top=True,
-            size = (250, 70)
-            )
+            size=(250, 70)
+        )
 
         while True:
             event, values = self._moduleWindow.read()
             if event == sg.WIN_CLOSED:
-                self.stop(toggle = True)
+                self.stop(toggle=True)
                 break
             elif event == "ON/OFF":
                 self.load()
         self.closeModuleWindow()
-        
+
     def startSearcherUi(self):
         from modules.stringSearch import Searcher
         sg.theme('HDV')
         layout = [
-            [sg.Multiline(size = (50, 5),
-            key = '-INPUT-', 
-            background_color= '#696968', 
-            text_color = '#eec606', 
-            font = 'Lato')],
+            [sg.Multiline(size=(50, 5),
+                          key='-INPUT-',
+                          background_color='#696968',
+                          text_color='#eec606',
+                          font='Lato')],
             [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25',
-            '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
+                                                                    '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
         ]
 
-        self._moduleWindow = sg.Window('Chat Searcher', layout, finalize = True, element_justification= 'center')
+        self._moduleWindow = sg.Window(
+            'Chat Searcher', layout, finalize=True, element_justification='center')
 
         loaded = False
         searcher = Searcher()
@@ -339,7 +351,7 @@ class GraphicalInterface():
             event, values = self._moduleWindow.read()
 
             if event == sg.WIN_CLOSED:
-                self.stop(toggle = True)
+                self.stop(toggle=True)
                 break
             elif event == 'ON/OFF':
                 if not loaded:
@@ -351,14 +363,15 @@ class GraphicalInterface():
         self.closeModuleWindow()
 
     def startNomansland(self):
-        from modules.nomanslandSniffer import Nomansland
+        from modules.hdvFilter import Nomansland
         sg.theme('HDV')
         layout = [
             [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25',
-            '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
+                                                                    '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
         ]
 
-        self._moduleWindow = sg.Window('Autopilotage Searcher', layout, finalize = True, element_justification= 'center')
+        self._moduleWindow = sg.Window(
+            'Autopilotage Searcher', layout, finalize=True, element_justification='center')
 
         loaded = False
         searcher = Nomansland()
@@ -366,7 +379,7 @@ class GraphicalInterface():
             event, values = self._moduleWindow.read()
 
             if event == sg.WIN_CLOSED:
-                self.stop(toggle = True)
+                self.stop(toggle=True)
                 break
             elif event == 'ON/OFF':
                 if not loaded:
@@ -376,17 +389,64 @@ class GraphicalInterface():
                     self.load()
         self.closeModuleWindow()
 
+    def startHDVFilter(self):
+        from modules.hdvFilter import HDVFilter
+        sg.theme('HDV')
+        layout = [
+            [sg.Button(image_filename=imgList['off'], button_color=('#2c2e25',
+                                                                    '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
+        ]
+
+        def rowElement(ind):
+            return [[
+                sg.In('', k=f'I-{ind}', size=(5, 0)),
+                sg.Text("Effect", key=f"EFFECT-{ind}", size=(25, 1), text_color="#32a844", font=('Helvetica', 12)),
+                sg.In('', k=f'HIDDEN-{ind}', size=(0, 0), visible=False)
+            ]]
+
+        layout += [[sg.Column(rowElement(i), visible=False,
+                              k=f'ROW-{i}')] for i in range(20)]
+
+        layout += [[sg.Button('Filter', key='FILTER',
+                              size=(10, 1), visible=False)]]
+
+        self._moduleWindow = sg.Window(
+            'HDV Filter', layout, finalize=True, element_justification='center', keep_on_top=True,)
+
+        self._moduleWindow.TKroot.minsize(250, 40)
+
+        loaded = False
+        searcher = HDVFilter()
+        while True:
+            event, values = self._moduleWindow.read()
+
+            if event == sg.WIN_CLOSED:
+                self.stop(toggle=True)
+                break
+            elif event == 'ON/OFF':
+                if not loaded:
+                    self.initilisation(searcher.packetRead, 0)
+                    loaded = True
+                else:
+                    self.load()
+            elif event == 'FILTER':
+                searcher.filterBids(values)
+        self.closeModuleWindow()
+
     def startMulticompteUi(self):
         from modules.multicompte import Multicompte
 
         def rowElement(ind):
-            return [[sg.In('', k = 'I' + f'{ind}', size =(15, 0)), sg.Checkbox('Mule', k = 'CB' + f'{ind}')]] 
+            return [[sg.In('', k='I' + f'{ind}', size=(15, 0)), sg.Checkbox('Mule', k='CB' + f'{ind}')]]
 
-        layout = [[sg.Column(rowElement(i), visible = False, k = 'ROW' + f'{i}')] for i in range(8)]
-        layout += [[sg.Button('Add character', key = '-ADD-'), sg.Button('Save config', key = '-SAVE-')]]
+        layout = [[sg.Column(rowElement(i), visible=False,
+                             k='ROW' + f'{i}')] for i in range(8)]
+        layout += [[sg.Button('Add character', key='-ADD-'),
+                    sg.Button('Save config', key='-SAVE-')]]
         layout += [[sg.Button(image_filename=imgList['off'], button_color=('#2c2e25',
-            '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]]
-        self._moduleWindow = sg.Window('Multicompte Tool', layout, element_justification = 'center')
+                                                                           '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]]
+        self._moduleWindow = sg.Window(
+            'Multicompte Tool', layout, element_justification='center')
 
         characterInd = 0
         loaded = False
@@ -398,7 +458,8 @@ class GraphicalInterface():
                 self.stop()
                 break
             elif (event == '-ADD-') and (characterInd < 8):
-                self._moduleWindow['ROW' + str(characterInd)].update(visible = True)
+                self._moduleWindow['ROW' +
+                                   str(characterInd)].update(visible=True)
                 characterInd += 1
             elif event == 'ON/OFF':
                 manager = Multicompte(values)
@@ -429,21 +490,21 @@ class GraphicalInterface():
             return
         self.initilisation(missingItems.packetRead, 0)
 
-
         sg.theme('HDV')
         layout = [
-            [sg.Button(button_text="Save", border_width=0, key="save", pad=(10, 0))]
+            [sg.Button(button_text="Save", border_width=0,
+                       key="save", pad=(10, 0))]
         ]
 
         self._moduleWindow = sg.Window(
-            'Missing Items Excel', 
-            layout, 
-            finalize = True, 
-            element_justification= 'center',
+            'Missing Items Excel',
+            layout,
+            finalize=True,
+            element_justification='center',
             grab_anywhere=True,
             keep_on_top=True,
-            use_default_focus = False
-            )
+            use_default_focus=False
+        )
 
         while True:
             event, values = self._moduleWindow.read()
@@ -458,14 +519,38 @@ class GraphicalInterface():
 
         self.closeModuleWindow()
 
+    def updateItem(self, item):
+        index = 0
+        self._moduleWindow[f"FILTER"].update(visible=True)
+        for i in range(20):
+            self._moduleWindow[f"I-{i}"].update('')
+            self._moduleWindow[f"HIDDEN-{i}"].update('')
+            self._moduleWindow[f"ROW-{i}"].update(visible=False)
+            self._moduleWindow[f"EFFECT-{i}"].update(text_color="#32a844")
 
-    def dataUpdate(self, data, colors = None):
-        self._moduleWindow['-TABLE-'].update(values = data, row_colors = colors)
+        for effectId, value in item['effects'].items():
+            text = None
+            if value['max'] == 0:
+                text = f"[{value['min']}] {value['type']}"
+            else:
+                text = f"[{value['min']} à {value['max']}] {value['type']}"
+            if value['operator'] == '-':
+                self._moduleWindow[f"EFFECT-{index}"].update(
+                    text_color="#ad2000")
+                text = '- ' + text
+            self._moduleWindow[f"ROW-{index}"].update(visible=True)
+            self._moduleWindow[f"EFFECT-{index}"].update(text)
+            self._moduleWindow[f"HIDDEN-{index}"].update(effectId)
+
+            index += 1
+
+    def dataUpdate(self, data, colors=None):
+        self._moduleWindow['-TABLE-'].update(values=data, row_colors=colors)
         self._moduleWindow.bring_to_front()
-        self._moduleWindow['-BAR-'].update(current_count = 100, visible = False)
+        self._moduleWindow['-BAR-'].update(current_count=100, visible=False)
         # self._moduleWindow['-BAR-'].update_bar(0)
-        self._moduleWindow['-PERCENT-'].update(visible  = True, disabled = False)
-        self._moduleWindow['-AUTOMATE-'].update(visible = True)
+        self._moduleWindow['-PERCENT-'].update(visible=True, disabled=False)
+        self._moduleWindow['-AUTOMATE-'].update(visible=True)
         self.load()
 
     def updateProgressBar(self, value):
@@ -477,7 +562,8 @@ class GraphicalInterface():
         try:
             self._moduleWindow["IMAGE"].update(image_filename=imgList[imgName])
         except KeyError:
-            self._moduleWindow["IMAGE"].update(image_filename=imgList['tooFar'])
+            self._moduleWindow["IMAGE"].update(
+                image_filename=imgList['tooFar'])
 
     def changeText(self, info):
         self._moduleWindow["INFO"].update(info)
@@ -489,38 +575,42 @@ class GraphicalInterface():
         currentX, currentY = ag.position()
         try:
             if self.found == "found":
-                pos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\' + 'flag.png', grayscale=True, confidence=.8)
+                pos = ag.locateCenterOnScreen(
+                    application_path + '\\..\\sources\\img\\pixel\\' + 'flag.png', grayscale=True, confidence=.8)
                 ag.leftClick(pos[0], pos[1])
             elif self.found == "checkpoint":
-                pos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\' + 'checkpoint.png', grayscale=True, confidence=.8)
+                pos = ag.locateCenterOnScreen(
+                    application_path + '\\..\\sources\\img\\pixel\\' + 'checkpoint.png', grayscale=True, confidence=.8)
                 ag.leftClick(pos[0], pos[1])
             elif self.found == "combat":
-                pos = ag.locateCenterOnScreen(application_path + '\\..\\sources\\img\\pixel\\' + 'combat.png', grayscale=True, confidence=.8)
+                pos = ag.locateCenterOnScreen(
+                    application_path + '\\..\\sources\\img\\pixel\\' + 'combat.png', grayscale=True, confidence=.8)
                 ag.leftClick(pos[0], pos[1])
         except TypeError:
             print("No next step detected, need to do it manually")
 
         ag.moveTo(currentX, currentY)
         self.found = None
-    
+
     def warningPopup(self):
         sg.Popup('WARNING', 'L\'item va être posté à un prix très éloigné du prix moyen estimé. Etes-vous sûr de vouloir le poster à ce prix ?')
 
     def overWrite(self):
         layout = [
-            [sg.Text("Today's items were already loaded. Do you want to overwrite them ?")],
-            [sg.Button("Yes", key = "yes"), sg.Button("No", key = "no")]
-        ] 
+            [sg.Text(
+                "Today's items were already loaded. Do you want to overwrite them ?")],
+            [sg.Button("Yes", key="yes"), sg.Button("No", key="no")]
+        ]
 
         window = sg.Window(
-            'Overwrite warning', 
+            'Overwrite warning',
             layout,
             use_default_focus=False,
             keep_on_top=True,
             no_titlebar=True,
             element_justification='center',
             grab_anywhere=False,
-            )
+        )
 
         event, values = window.read()
         if event == "yes":
@@ -532,7 +622,8 @@ class GraphicalInterface():
 
     def abortWindow(self):
         self._abortWindow = True
-        
+
+
 def init(startSniff):
     global ui
     ui = GraphicalInterface(startSniff)
@@ -540,4 +631,3 @@ def init(startSniff):
         ui.startUi()
     except sg.FailSafeException:
         print(Fore.RED + 'Fail Safe Activated, aborting' + Fore.RESET)
-

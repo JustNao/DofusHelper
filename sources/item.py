@@ -13,12 +13,28 @@ with open('sources\\gameRessources\\prices.json', encoding='utf-8') as f:
 with open('sources\\gameRessources\\runes.json', encoding='utf-8') as f:
     runes = json.load(f)
 
+with open('sources\\gameRessources\\i18n_fr.json', encoding='utf-8') as f:
+    i18n = json.load(f)
+
+with open('sources\\gameRessources\\Items.json', encoding='utf-8') as f:
+    itemJs = json.load(f)
 
 itemToName = {}
 for key in gameItems:
     try:
         for item in gameItems[key]:
             itemToName[item['id']] = i18n['texts'][str(item['nameId'])]
+    except KeyError:
+        pass
+
+items = {}
+for item in itemJs:
+    try:
+        items[item['id']] = {
+            'name': i18n['texts'][str(item['nameId'])],
+            'possibleEffects': item['possibleEffects'],
+            'level': item['level'],
+        }
     except KeyError:
         pass
 
