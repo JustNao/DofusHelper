@@ -92,23 +92,6 @@ class HDVFilter:
                 }
 
         for bid in self.bids:
-            # valid = True
-            # for effectId in self.item['effects'].keys():
-            #     found = False
-            #     for packetEffect in bid['effects']:
-            #         if 'min' in packetEffect:
-            #             # Weapon damage
-            #             break
-            #         if packetEffect['actionId'] == effectId and effectId in characFilter and packetEffect['value'] < (characFilter[effectId]['value'] - characFilter[effectId]['diff']):
-            #             valid = False
-            #             break
-            #         else:
-            #             found = True
-            #     if not found:
-            #         valid = False
-            #         break
-            # if valid:
-            #     self.releventBids.append(bid)
             valid = True
             for effect in characFilter:
                 if not valid:
@@ -149,7 +132,7 @@ class HDVFilter:
                 displayEffectRaw = re.split(r'[ {}~%#]', fullEffect)
                 displayEffect = []
                 for split in displayEffectRaw:
-                    if len(split) > 2:
+                    if len(split) > 2 or split in ('PA', 'PM'):
                         displayEffect.append(split)
                 if '%' in fullEffect:
                     displayEffect.append('(%)')

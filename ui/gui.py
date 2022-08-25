@@ -397,16 +397,30 @@ class GraphicalInterface():
                                                                     '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
         ]
 
-        def rowElement(ind):
+        layout += [[
+            sg.Button('+1 PA', key='PA', size=(10, 1), visible=False),
+            sg.Button('+1 PM', key='PM', size=(10, 1), visible=False),
+            sg.Button('+1 PO', key='PO', size=(10, 1), visible=False),
+            ]]
+
+        def rowElement(ind: int):
             return [[
                 sg.In('', k=f'I-{ind}', size=(5, 0)),
                 sg.Text("Effect", key=f"EFFECT-{ind}", size=(25, 1), text_color="#32a844", font=('Helvetica', 12)),
                 sg.In('', k=f'HIDDEN-{ind}', size=(0, 0), visible=False)
             ]]
 
+        def exoRow(exo: str):
+            return [[
+                sg.Text(f"+1 {exo}", key=f"TEXT-{exo}", size=(25, 1),
+                        text_color="#0390fc", font=('Helvetica', 12)),
+                sg.In('', k=f'HIDDEN-{exo}', size=(0, 0), visible=False)
+            ]]
+
         layout += [[sg.Column(rowElement(i), visible=False,
                               k=f'ROW-{i}')] for i in range(20)]
-
+        layout += [[sg.Column(exoRow(i), visible=False,
+                              k=f'ROW-EXO-{i}')] for i in ('PA', 'PM', 'PO')]
         layout += [[sg.Button('Filter', key='FILTER',
                               size=(10, 1), visible=False)]]
 
@@ -417,6 +431,11 @@ class GraphicalInterface():
 
         loaded = False
         searcher = HDVFilter()
+        exoId = {
+            'PA': 111,
+            'PM': 128,
+            'PO': 117
+        }
         while True:
             event, values = self._moduleWindow.read()
 
@@ -431,6 +450,12 @@ class GraphicalInterface():
                     self.load()
             elif event == 'FILTER':
                 searcher.filterBids(values)
+            elif event in ('PA', 'PM', 'PO'):
+                self._moduleWindow[f"HIDDEN-{event}"].update('')
+                self._moduleWindow[f"ROW-EXO-{event}"].update(visible=True)
+                for hide in list(set(('PA', 'PM', 'PO')) - set([event])):
+                    self._moduleWindow[f"HIDDEN-{hide}"].update('')
+                    self._moduleWindow[f"ROW-EXO-{hide}"].update(visible=False)
         self.closeModuleWindow()
 
     def startMulticompteUi(self):
@@ -527,6 +552,11 @@ class GraphicalInterface():
             self._moduleWindow[f"HIDDEN-{i}"].update('')
             self._moduleWindow[f"ROW-{i}"].update(visible=False)
             self._moduleWindow[f"EFFECT-{i}"].update(text_color="#32a844")
+
+        for i in ('PA', 'PM', 'PO'):
+            self._moduleWindow[f"ROW-EXO-{i}"].update(visible=False)
+            self._moduleWindow[f"HIDDEN-{i}"].update('')
+            self._moduleWindow[f"{i}"].update(visible=True)
 
         for effectId, value in item['effects'].items():
             text = None
