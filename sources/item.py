@@ -4,6 +4,9 @@ import json
 with open('sources\\gameRessources\\gameItems.json', encoding='utf-8') as f:
     gameItems = json.load(f)
 
+with open('sources\\gameRessources\\equipmentPrices.json', encoding='utf-8') as f:
+    equipmentPrices = json.load(f)
+
 with open('sources\\gameRessources\\Recipes.json', encoding='utf-8') as f:
     recipes = json.load(f)
 

@@ -107,6 +107,8 @@ class GraphicalInterface():
                       group_id="CHOICE", key='huntHelper')],
             [sg.Radio("HDV Items Listing", group_id="CHOICE", key='hdv')],
             [sg.Radio("HDV Missing Items", group_id="CHOICE", key='hdvMissing')],
+            [sg.Radio("Equipment Price Listing",
+                      group_id="CHOICE", key='equipmentListing')],
             [sg.Radio("No man's land", group_id="CHOICE", key='nomansland')]
         ]
 
@@ -167,6 +169,8 @@ class GraphicalInterface():
                 self.startMissingItemsUi()
             elif (self.userChoice == 'priceListing'):
                 self.startPriceListingUi()
+            elif (self.userChoice == 'equipmentListing'):
+                self.startEquipmentListingUi()
             elif (self.userChoice == 'priceCompute'):
                 self.startPriceComputerUi()
             elif (self.userChoice == 'nomansland'):
@@ -274,6 +278,41 @@ class GraphicalInterface():
         sg.theme('HDV')
         self._moduleWindow = sg.Window(
             'Ressources Price Listing',
+            layout,
+            resizable=True,
+            element_justification='center',
+            grab_anywhere=True,
+            keep_on_top=True,
+        )
+
+        loaded = False
+        while True:
+            event, values = self._moduleWindow.read()
+            if event == sg.WIN_CLOSED:
+                self.stop(toggle=True)
+                break
+            elif event == "ON/OFF":
+                if not loaded:
+                    self.initilisation(packetRead, 0.3)
+                    loaded = True
+                else:
+                    self.load()
+        self.closeModuleWindow()
+
+    def startEquipmentListingUi(self):
+        from modules.equipmentListing import EquipmentListing
+
+        packetRead = EquipmentListing().packetRead
+
+        layout = [
+            [sg.Text("Item index", key="INFO", auto_size_text="true")],
+            [sg.Button(image_filename=imgList['off'], button_color=(
+                '#2c2e25', '#2c2e25'), border_width=0, key="ON/OFF", pad=(10, 0))]
+        ]
+
+        sg.theme('HDV')
+        self._moduleWindow = sg.Window(
+            'Equipment Price Listing',
             layout,
             resizable=True,
             element_justification='center',
