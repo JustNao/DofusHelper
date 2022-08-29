@@ -16,7 +16,7 @@ driver = webdriver.Chrome(chrome_options=options)
 driver.get(link)
 
 req = driver.wait_for_request(
-    r'(.*objets\?stuff=.*)|(.*stuffs\/dofus\/(private)|(public)\/\d*)')
+    r'(.*dofus\/stuffer\/.*)|(.*stuffs\/dofus\/(private)|(public)\/\d*)')
 response = req.response
 body = decode(response.body, response.headers.get(
     'Content-Encoding', 'identity'))
@@ -32,10 +32,10 @@ if 'items' in stuffData:
 else:
   for item in stuffData['data']:
     try:
-      print(itemToName[item['official']])
       totalPrice += equipmentPrices[str(item['official'])]
     except KeyError:
-      print('Didn\'t find', item['official'])
+      print(
+          f"Missing price for {itemToName[item['official']]}, {str(item['official'])}", )
 
 driver.quit()
 print(f"{kamasToString(totalPrice)} K")
