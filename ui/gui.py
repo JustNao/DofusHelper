@@ -183,7 +183,8 @@ class GraphicalInterface():
     def startTreasureHuntUi(self):
 
         from modules.treasureHuntBot import TreasureHuntHelper
-        self.initilisation(TreasureHuntHelper(self.botting).packetRead, 0)
+        bot = TreasureHuntHelper(self.botting)
+        self.initilisation(bot.packetRead, 0)
 
         sg.theme('TreasureHunt')
 
@@ -223,6 +224,7 @@ class GraphicalInterface():
                 self.load()
             elif (event == sg.WIN_CLOSED) or (event == "EXIT"):
                 self.stop(toggle=True)
+                bot.exit()
                 break
             self._moduleWindow.refresh()
 

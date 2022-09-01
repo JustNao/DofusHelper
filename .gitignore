@@ -12,3 +12,4 @@ access*
 itemAveragePrices.dat
 backup*
 protocol/*
+config.json

@@ -42,7 +42,7 @@ Localise les indices de chasse au trésor. Une mini fenêtre s'ouvre pour affich
 
 ### Treasure Hunt Bot
 
-Mêmes fonctionnalités et fenêtre que le helper, mais tout est automatisé (sauf le combat). Les déplacements s'effectuent pas un clic. Pour le bas le bot recherche l'icône de changement de barre de sort, il faut donc que vous soyez à la première page pour le calibrage au lancement de l'application. Pour le reste des déplacements, le milieu de l'écran est pris.
+Mêmes fonctionnalités et fenêtre que le helper, mais tout est automatisé (sauf le combat). Par défaut, les déplacements s'effectuent pas un clic. Pour le bas le bot recherche l'icône de changement de barre de sort, il faut donc que vous soyez à la première page pour le calibrage au lancement de l'application. Pour le reste des déplacements, le milieu de l'écran est pris. Un fichier `config.json` est créé à la racine au premier lancement du bot où vous pouvez passer `autopilot` à `true` pour activer le mode monture autopilotée.
 
 ### HDV Filter
 

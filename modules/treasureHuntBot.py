@@ -8,7 +8,7 @@ import ui.gui as g
 from sources.id import mapIdToCoords, textId, poiToName, npcToName, monsterToName, archiNameList
 from colorama import init, Fore, Style
 import time
-import requests
+import pyperclip
 from sniffer import protocol
 from PIL.ImageOps import grayscale
 from seleniumwire import webdriver
@@ -29,7 +29,7 @@ class TreasureHuntHelper():
 
         # Running selenium webdriver in the background to simulate the user's clicks on the site
         options = Options()
-        options.add_argument('--headless')
+        # options.add_argument('--headless')
         options.add_argument("log-level=1")
         self.driver = webdriver.Chrome(chrome_options=options)
         self.driver.get("https://dofusdb.fr/fr/tools/treasure-hunt")
@@ -46,8 +46,26 @@ class TreasureHuntHelper():
             "lookingFor": False,
             "npcId": 2673
         }
+        self.autopilot = False
+
         if self.botting:
             self.initBotting()
+
+        try:
+            with open('config.json', 'r') as config_file:
+                config = json.load(config_file)
+                config_file.close()
+        except FileNotFoundError:
+            with open('config.json', 'w') as config_file:
+                config = {
+                    "autopilot": False
+                }
+                json.dump(config, config_file)
+                config_file.close()
+
+        self.autopilot = config["autopilot"]
+        self.autopilotMoving = False
+
         if getattr(sys, 'frozen', False):
             # If the application is run as a bundle, the PyInstaller bootloader
             # extends the sys module by a flag frozen=True and sets the app
@@ -73,6 +91,9 @@ class TreasureHuntHelper():
         def __str__(self):
             return '[' + str(self.x) + ',' + str(self.y) + ']'
 
+    def exit(self):
+        self.driver.quit()
+
     def initBotting(self):
         # Initialisation du bot, fixe les positions de changement de carte
         ag.FAILSAFE = True
@@ -96,12 +117,35 @@ class TreasureHuntHelper():
     def move(self):
         # Déplacement du bot
 
+        if self.direction == "stay":
+            return
+
         if (not self.botting) or (self.hintPos.distance > 10 and not self.phorreur['lookingFor']):
             return
 
         # For first step, the hint will likely be away
         if abs(self.playerPos.x - self.hintPos.x) > 10 or abs(self.playerPos.y - self.hintPos.y) > 10:
             return
+
+        # Autopilot directly to the hint pos
+        if self.autopilot:
+            # If the autopilot is on, we don't move the bot
+            if self.autopilotMoving:
+                return
+
+            if not self.phorreur['lookingFor']:
+                self.autopilotMoving = True
+                x, y = self.hintPos.x, self.hintPos.y
+                ag.hotkey('space')
+                print("Autopilot : moving to", x, y)
+                pyperclip.copy(f"/travel {x} {y}")
+                ag.hotkey('ctrl', 'v')
+                ag.hotkey('enter')
+                time.sleep(0.5)
+                ag.hotkey('enter')
+                time.sleep(0.5)
+                ag.hotkey('esc')
+                return
 
         currentMousePos = ag.position()
         # time.sleep(random()*2) # Temps de pause entre chaque action, risqué car fait attendre le thread entier
@@ -203,6 +247,7 @@ class TreasureHuntHelper():
                 g.ui.changeImg("found")
                 g.ui.changeDirection()
                 self.direction = "stay"
+                self.autopilotMoving = False
                 time.sleep(1)
                 if self.botting:
                     g.ui.clickNextStep()
@@ -211,6 +256,7 @@ class TreasureHuntHelper():
         self.hintPos.distance = 666
         self.direction = "stay"
         self.phorreur['lookingFor'] = False
+        self.autopilotMoving = False
 
     def getDofusDBPos(self, hintBody, poiToLookFor):
         hintBody["data"].sort(key=lambda x: x["distance"])
@@ -232,12 +278,19 @@ class TreasureHuntHelper():
         remotePosY.click()
         remotePosY.send_keys(Keys.CONTROL, 'a')
         remotePosY.send_keys(posY)
-        direction = self.driver.find_element(
+        arrow = self.driver.find_element(
             By.XPATH, f"//i[contains(@class, 'fa-arrow-{direction}')]")
-        direction.click()
+        arrow.click()
 
-        hintRequest = self.driver.wait_for_request(
-            "https://api.dofusdb.fr/treasure-hunt")
+        try:
+            hintRequest = self.driver.wait_for_request(
+                "https://api.dofusdb.fr/treasure-hunt")
+        except Exception:
+            self.driver.refresh()
+            print("Error with DofusDB request, retrying in 3 seconds...")
+            time.sleep(3)
+            return self.getDofusDBRequest(posX, posY, direction, poiToLookFor)
+
         response = hintRequest.response
         body = decode(response.body, response.headers.get(
             'Content-Encoding', 'identity'))
@@ -304,6 +357,8 @@ class TreasureHuntHelper():
                     g.ui.changeImg('archimonstre')
                     g.ui.load()
                     self.direction = "stay"
+                    self.autopilotMoving = False
+                    ag.hotkey("'")
                     break
 
         self.move()
@@ -318,7 +373,7 @@ class TreasureHuntHelper():
             if (packet['checkPointCurrent'] == 0):
                 print(Fore.YELLOW + "Starting treasure hunt" + Fore.RESET)
                 self.timeStart = time.time()
-                self.playerPos = self.Position(-25, -36)  # Malle aux trésors
+                # self.playerPos = self.Position(-25, -36)  # Malle aux trésors
                 g.ui.changeDirection()
 
         elif len(packet['flags']) == packet['totalStepCount']:
