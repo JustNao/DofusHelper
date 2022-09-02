@@ -16,7 +16,7 @@ print('Sources imported !')
 locale.setlocale(locale.LC_ALL, '')
 if getattr(sys, 'frozen', False):
     # If the application is run as a bundle, the PyInstaller bootloader
-    # extends the sys module by a flag frozen=True and sets the app 
+    # extends the sys module by a flag frozen=True and sets the app
     # path into variable _MEIPASS'.
     application_path = sys._MEIPASS
 else:
@@ -25,13 +25,13 @@ else:
 class Item:
     def __init__(self, quantity, price):
         self.count = [
-            {'quantity': 0, 'postedPrice': 0}, 
-            {'quantity': 0, 'postedPrice': 0}, 
+            {'quantity': 0, 'postedPrice': 0},
+            {'quantity': 0, 'postedPrice': 0},
             {'quantity': 0, 'postedPrice': 0}
         ]
         self.count[quantity]['quantity'] = 1
         self.count[quantity]['postedPrice'] = price
-    
+
     def __str__(self):
         return str(self.count)
 
@@ -110,7 +110,7 @@ def getCurrentSells(packet):
         for secondItem in sells:
             if (secondItem in newSells) and (firstItem != secondItem) and ((itemToName[firstItem] in itemToName[secondItem]) or (itemToName[secondItem] in itemToName[firstItem])):
                 newSells.pop(secondItem)
-    
+
     sells = newSells
     for key in sells:
         print(str(key) + ' : ' + str(sells[key]))
@@ -122,8 +122,8 @@ def getCurrentPrice(packet):
 
 def packetRead(msg):
     global sellsList, index, posSearch, sellInfoPos, middleElementPos, selectPos
-    if msg.id == 1313:
-        # ExchangeStartedSellerMessage
+    name = protocol.msg_from_id[msg.id]['name']
+    if name == 'ExchangeStartedBidSellerMessage':
         packet = protocol.readMsg(msg)
         if packet is None:
             return
@@ -158,8 +158,7 @@ def packetRead(msg):
         time.sleep(1)
         ag.click(sellInfoPos)
 
-    elif msg.id == 6179:
-        # ExchangeBidPriceForSellerMessage
+    elif name == 'ExchangeBidPriceForSellerMessage':
         packet = protocol.read(protocol.msg_from_id[msg.id]["name"], msg.data)
         getCurrentPrice(packet)
 
@@ -212,14 +211,14 @@ def setNewPrice():
             print('Changing', Fore.YELLOW + str(item['playerAmount'].count[unit]['quantity']*pow(10, unit)) + Fore.RESET, 'units of', Fore.YELLOW + item['name'] + Fore.RESET, 'to', Fore.YELLOW + str('{:n}'.format(newPrice)) + 'K' + Fore.RESET)
             ag.typewrite(str(newPrice), interval = 0.05)
             ag.typewrite(['return'])
-            
+
             warned = False
             if (ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\warning.png') is not None):
                 print(Fore.RED + 'WARNING : price is very far from the estimated one. Do you confirm using the new price ?' + Fore.RESET)
                 warned = True
             while (ag.locateOnScreen(application_path + '\\..\\sources\\img\\pixel\\warning.png') is not None):
                 time.sleep(0.5)
-            
+
             skipItem = "n"
             if warned:
                 skipItem = input("Do you want to skip the item ? y/n\n")
