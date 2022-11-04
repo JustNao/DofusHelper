@@ -108,7 +108,7 @@ class HDVFilter:
                 if bidEffect['actionId'] == effectId:
                     found = True
                     break
-            if not found and bidEffect['value'] > 0:
+            if not found and 'value' in bidEffect and bidEffect['value'] > 0:
                 print(
                     f"{Fore.MAGENTA} +{bidEffect['value']} {self.fullEffect(bidEffect['actionId'])}{Fore.RESET}")
 
