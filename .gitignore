@@ -13,3 +13,4 @@ itemAveragePrices.dat
 backup*
 protocol/*
 config.json
+output/*
