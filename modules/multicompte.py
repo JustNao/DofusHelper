@@ -1,5 +1,7 @@
-print('Importing sources ...')
+print("Importing sources ...")
 
+import random
+import re
 from typing import Type
 from pywinauto.findbestmatch import find_best_match
 from sniffer import protocol
@@ -9,83 +11,83 @@ from win32 import win32gui
 import win32com.client as client
 import pyautogui as ag
 import json
-print('Sources imported !')
+import win32gui, win32api, win32con
+from time import sleep
+
+print("Sources imported !")
+
 
 class Perso:
-    def __init__(self, id = 0, mule = False):
+    def __init__(self, id=0, mule=False, window=None):
         self.id = id
         self.mule = mule
         self.active = False
+        self.window = window
+
 
 class Multicompte:
-
-    def __init__(self, userChoice) -> None:
-        bad_chars = ' \n'
+    def __init__(self) -> None:
         self.characters = {}
-        if userChoice['I0'] != '':
-            for i in range(8):
-                if userChoice['I' + str(i)] != '':
-                    self.characters[userChoice['I' + str(i)]] = Perso(mule = userChoice['CB' + str(i)])
-                else:
-                    break
-        else:   
-            try:
-                with open('config/multicompte.json') as file:
-                    importedChars = json.load(file)
-            except FileNotFoundError:
-                print("No character was manually put, and no file could be detected")
-                return
+        self.auto_turn = False
+        windows = ag.getAllTitles()
+        windows = [x for x in windows if re.search("- Dofus \d\.", x)]
 
-            for char in importedChars:
-                print("Importing", char['name'])
-                self.characters[char['name']] = Perso(mule = char['mule'])
+        try:
+            with open("config/multicompte.json") as file:
+                importedChars = json.load(file)
+        except FileNotFoundError:
+            print("No character was manually put, and no file could be detected")
+            return
+        for char in importedChars:
+            name = char["name"]
+            print(f"Importing {Fore.BLUE}{name}{Fore.RESET}")
+            window = [x for x in windows if re.search(char["name"], x)].pop()
+            self.characters[char["name"]] = Perso(
+                mule=char["mule"], window=win32gui.FindWindow(None, window)
+            )
 
-        self.top_windows = []
-        win32gui.EnumWindows(self.windowEnumerationHandler, self.top_windows)
-
-    def windowEnumerationHandler(self, hwnd, top_windows):
-        top_windows.append((hwnd, win32gui.GetWindowText(hwnd)))
-
-    
     def packetRead(self, msg):
-        if msg.id == 3775 : 
-            # 3775 PartyUpdateLightMessage
-            # 9871 GameSynchronizingMessage
+        name = protocol.msg_from_id[msg.id]["name"]
+
+        if name == "GameFightUpdateTeamMessage":
             packet = protocol.readMsg(msg)
             if packet is None:
                 return
-            try:
-                # for entity in packet['fighters']:
-                #     if entity['__type__'] == 'GameFightCharacterInformations':
-                #         self.characters[entity['name']].id = entity['contextualId']
-                charName = win32gui.GetWindowText(win32gui.GetForegroundWindow()).split()[0]
-                if (charName in self.characters.keys()) and (self.characters[charName].id == 0):
-                    self.characters[charName].id = packet['id']
-                    print("Setting up", charName)
-            except KeyError:
-                pass
-        elif msg.id == 3049:
-            # GameFightTurnStartMessage
+
+            for member in packet["team"]["teamMembers"]:
+                if member["name"] in self.characters:
+                    self.characters[member["name"]].id = member["id"]
+                    break
+
+        elif name == "GameFightTurnStartMessage":
             packet = protocol.readMsg(msg)
             if packet is None:
                 return
-            name = self.idToName(packet['id'])
-            if name not in self.characters.keys() or self.characters[name].active:
-                return
 
-            for char in self.characters:
-                self.characters[char].active = (char == name)
-            
-            shell = client.Dispatch("WScript.Shell")
-            shell.SendKeys('%')
-            print("Bringing up", name)
-            win32gui.SetForegroundWindow(find_window(best_match = name + ' - Dofus'))
-            if self.characters[name].mule:
-                ag.typewrite(['v'])
+            if packet["id"] in [x.id for x in self.characters.values()]:
+                character = self.get_character(packet["id"])
+                if self.auto_turn and character.mule:
+                    sleep(random.uniform(0.2, 0.8))
+                    self.send_keystroke(character.window, 0x56)
+                else:
+                    shell = client.Dispatch("WScript.Shell")
+                    shell.SendKeys("%")
+                    win32gui.SetForegroundWindow(character.window)
 
+    def send_keystroke(self, window, key=0x56):
+        win32api.SendMessage(window, win32con.WM_KEYDOWN, key, 0)
+        win32api.SendMessage(window, win32con.WM_KEYUP, key, 0)
 
-    def idToName(self, id):
-        for character in self.characters:
-            if self.characters[character].id == id:
+    def get_character(self, id):
+        for character in self.characters.values():
+            if character.id == id:
                 return character
-# Epoque, Imminent
+
+    def toggle_auto_turn(self):
+        self.auto_turn = not self.auto_turn
+        if self.auto_turn:
+            print(f"{Fore.GREEN}Auto turn is now enabled{Fore.RESET}")
+            return "on"
+        else:
+            print(f"{Fore.RED}Auto turn is now disabled{Fore.RESET}")
+            return "off"
