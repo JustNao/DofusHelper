@@ -13,6 +13,7 @@ import pyautogui as ag
 import json
 import win32gui, win32api, win32con
 from time import sleep
+import mouse
 
 print("Sources imported !")
 
@@ -46,6 +47,8 @@ class Multicompte:
                 mule=char["mule"], window=win32gui.FindWindow(None, window)
             )
 
+        mouse.on_middle_click(self.all_move)
+
     def packetRead(self, msg):
         name = protocol.msg_from_id[msg.id]["name"]
 
@@ -55,7 +58,7 @@ class Multicompte:
                 return
 
             for member in packet["team"]["teamMembers"]:
-                if member["name"] in self.characters:
+                if "name" in member and member["name"] in self.characters:
                     self.characters[member["name"]].id = member["id"]
                     break
 
@@ -91,3 +94,14 @@ class Multicompte:
         else:
             print(f"{Fore.RED}Auto turn is now disabled{Fore.RESET}")
             return "off"
+
+    def all_move(self):
+        x, y = mouse.get_position()
+        lParam = win32api.MAKELONG(x, y)
+        for character in self.characters.values():
+            win32api.SendMessage(
+                character.window, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, lParam
+            )
+            win32api.SendMessage(
+                character.window, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, lParam
+            )

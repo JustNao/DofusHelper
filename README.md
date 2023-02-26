@@ -71,6 +71,8 @@ Le module utilise le fichier `config/multicompte.json` pour récupérer les noms
 
 Par défaut le module va juste ouvrir la fenêtre du joueur, mais si la valeur `mule` est à `true`, le module va juste envoyer la touche `v` au client (touche pour passer le tour dans mon cas), même si le client est en background. Donc si vous êtes une mule sasa, le module passe le tour tout seul sans que vous ayez à avoir le jeu ouvert. L'interface graphique a un mode on/off qui permet de toggle rapidement le mode "passe-tour", par exemple s'il y a un challenge qui nécessite d'effectuer une action avant de passer.
 
+Cliquer avec le bouton milieu de la souris va envoyer le click sur tous personnages chargés dans le module.
+
 ### AvA Counter
 
 Une fois lancé, à chaque changement de map un comptage des joueurs présents par alliance sera fait (utile en cas de AvA où des piles sont faites pour compter le nomber de joueurs).
