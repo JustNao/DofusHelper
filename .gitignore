@@ -14,3 +14,4 @@ backup*
 protocol/*
 config.json
 output/*
+multicompte.json
