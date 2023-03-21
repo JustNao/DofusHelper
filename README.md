@@ -1,4 +1,8 @@
+
+
 # Avertissement
+
+## Vous pouvez trouver le nouveau projet basé sur Dofus Help Manager sur : [Karrelage](github.com/JustNao/Karrelage)
 
 Tous les scripts utilisent des IDs de packet qui sont très souvent changés par Ankama. Ils nécessitent donc une mise à jour manuelle pour fonctionner.
 Je ne joue pas régulièrement donc les IDs sont rarement exactes; je laisse quand même les scripts pour ceux que ça intéresse, si vous tombez sur un bon moment et j'ai mis à jour récemment, ou si vous voulez vous-même mettre à jour les IDs (les scripts que j'utilise pour le faire sont ceux de LaBot, lien tout en bas).
